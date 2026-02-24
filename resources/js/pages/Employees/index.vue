@@ -1,26 +1,323 @@
 <template>
-<div class="app-content-header">
-          <!--begin::Container-->
-          <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">Employees</h3></div>
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="#">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Employees</li>
-                </ol>
-              </div>
-            </div>
-            <!--end::Row-->
-          </div>
-          <!--end::Container-->
+  <div class="container-fluid mt-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{{ $t('employees.title') }}</h3>
+        <div class="card-tools">
+          <button class="btn btn-primary btn-sm" @click="openCreateModal">
+            <i class="fas fa-plus"></i> Nouvel Employé
+          </button>
         </div>
-        <!--end::App Content Header-->
-        <!--begin::App Content-->
-        <div class="app-content">
-          <!--begin::Container-->
+      </div>
 
-          <!--end::Container-->
+      <div class="card-body">
+        <!-- Recherche -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Rechercher un employé..."
+              v-model="search"
+            />
+          </div>
         </div>
+
+        <!-- Loader -->
+        <div v-if="loading" class="text-center">
+          <div class="spinner-border" role="status"></div>
+        </div>
+
+        <!-- Tableau -->
+        <div v-else class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>{{ $t('employees.id')}}</th>
+                <th>{{ $t('employees.last_name')}}</th>
+                <th>{{ $t('employees.first_name')}}</th>
+                <th>{{ $t('employees.position')}}</th>
+                <th>{{ $t('employees.hire_date')}}</th>
+                <th>{{ $t('employees.contract_type')}}</th>
+                <th>{{ $t('employees.base_salary')}}</th>
+                <th>{{ $t('employees.status')}}</th>
+                <th>{{ $t('common.actions')}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="employee in filteredEmployees" :key="employee.employee_id">
+                <td>{{ employee.matricule }}</td>
+                <td>{{ employee.last_name }}</td>
+                <td>{{ employee.first_name }}</td>
+                <td>{{ employee.position?.position_name || '-' }}</td>
+                <td>{{ formatDate(employee.hire_date) }}</td>
+                <td>{{ employee.contract_type }}</td>
+                <td>{{ formatCurrency(employee.base_salary) }}</td>
+                <td>
+                  <span :class="getStatusClass(employee.status)">
+                    {{ employee.status }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-info" @click="editEmployee(employee)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger ms-1" @click="deleteEmployee(employee.employee_id)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Create/Edit -->
+    <div class="modal fade" id="employeeModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ isEditing ? 'Modifier' : 'Créer' }} Employé</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Prénom *</label>
+                  <input type="text" class="form-control" v-model="form.first_name" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Nom *</label>
+                  <input type="text" class="form-control" v-model="form.last_name" required />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Matricule *</label>
+                  <input type="text" class="form-control" v-model="form.matricule" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Poste *</label>
+                  <select class="form-select" v-model="form.position_id" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option v-for="pos in positions" :key="pos.position_id" :value="pos.position_id">
+                      {{ pos.position_name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Date d'embauche *</label>
+                  <input type="date" class="form-control" v-model="form.hire_date" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Type de Contrat *</label>
+                  <select class="form-select" v-model="form.contract_type" required>
+                    <option value="CDI">CDI</option>
+                    <option value="CDD">CDD</option>
+                    <option value="stage">Stage</option>
+                    <option value="Freelance">Freelance</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Date fin contrat (si CDD)</label>
+                  <input type="date" class="form-control" v-model="form.contract_end_date" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Salaire de Base *</label>
+                  <input type="number" step="0.01" class="form-control" v-model="form.base_salary" required />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Statut</label>
+                  <select class="form-select" v-model="form.status">
+                    <option value="active">Actif</option>
+                    <option value="inactive">Inactif</option>
+                    <option value="on_leave">En congé</option>
+                    <option value="syspended">Suspendu</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Actif</label>
+                  <select class="form-select" v-model="form.active">
+                    <option :value="true">Oui</option>
+                    <option :value="false">Non</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary" @click="saveEmployee">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
+
+<script>
+import { Modal } from 'bootstrap';
+import axios from 'axios'
+
+export default {
+  name: 'Employees',
+  data() {
+    return {
+      employees: [],
+      positions: [],
+      loading: false,
+      search: '',
+      isEditing: false,
+      form: this.getEmptyForm(),
+      modal: null
+    };
+  },
+
+  computed: {
+    filteredEmployees() {
+      if (!this.search) return this.employees;
+      const searchLower = this.search.toLowerCase();
+      return this.employees.filter(emp =>
+        emp.first_name.toLowerCase().includes(searchLower) ||
+        emp.last_name.toLowerCase().includes(searchLower) ||
+        emp.matricule.toString().includes(searchLower)
+      );
+    }
+  },
+
+  mounted() {
+    this.fetchEmployees();
+    this.fetchPositions();
+    this.modal = new Modal(document.getElementById('employeeModal'));
+  },
+
+  methods: {
+    getEmptyForm() {
+      return {
+        employee_id: null,
+        first_name: '',
+        last_name: '',
+        matricule: '',
+        position_id: '',
+        hire_date: '',
+        contract_type: 'CDI',
+        contract_end_date: null,
+        status: 'Actif',
+        active: true,
+        base_salary: 0,
+        company_id: 1
+      };
+    },
+
+    async fetchEmployees() {
+      this.loading = true;
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/employees');
+        this.employees = response.data.data || response.data;
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors du chargement des employés');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchPositions() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/positions');
+        this.positions = response.data.data || response.data;
+      } catch (error) {
+        console.error('Erreur:', error);
+      }
+    },
+
+    openCreateModal() {
+      this.isEditing = false;
+      this.form = this.getEmptyForm();
+      this.modal.show();
+    },
+
+    editEmployee(employee) {
+      this.isEditing = true;
+      this.form = { ...employee };
+      this.modal.show();
+    },
+
+   async saveEmployee() {
+  try {
+    if (this.isEditing) {
+      await axios.put(`/employees/${this.form.employee_id}`, this.form);
+      alert('Employé modifié avec succès');
+    } else {
+      await axios.post('/employees', this.form);
+      alert('Employé créé avec succès');
+    }
+
+    this.modal.hide();
+    this.fetchEmployees();
+  } catch (error) {
+    console.error('Erreur complète:', error.response); // ← AJOUTEZ CECI
+
+    // Afficher les erreurs de validation
+    if (error.response && error.response.data && error.response.data.errors) {
+      const errors = error.response.data.errors;
+      let errorMessage = 'Erreurs de validation:\n';
+      for (let field in errors) {
+        errorMessage += `- ${field}: ${errors[field].join(', ')}\n`;
+      }
+      alert(errorMessage);
+    } else if (error.response && error.response.data && error.response.data.message) {
+      alert(error.response.data.message);
+    } else {
+      alert('Erreur lors de l\'enregistrement');
+    }
+  }
+},
+    async deleteEmployee(id) {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) return;
+
+      try {
+        await axios.delete(`/employees/${id}`);
+        alert('Employé supprimé avec succès');
+        this.fetchEmployees();
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la suppression');
+      }
+    },
+
+    formatDate(date) {
+      if (!date) return '-';
+      return new Date(date).toLocaleDateString('fr-FR');
+    },
+
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'MGA' // ou 'EUR' selon votre devise
+      }).format(amount);
+    },
+
+    getStatusClass(status) {
+      const classes = {
+        'Actif': 'badge bg-success',
+        'En congé': 'badge bg-warning',
+        'Suspendu': 'badge bg-danger'
+      };
+      return classes[status] || 'badge bg-secondary';
+    }
+  }
+};
+</script>

@@ -231,7 +231,7 @@
           /> -->
           <!--end::Brand Image-->
           <!--begin::Brand Text-->
-          <span class="brand-text fw-light">AdminLTE 4</span>
+          <span class="brand-text fw-light">PayFlex</span>
           <!--end::Brand Text-->
         </a>
         <!--end::Brand Link-->
@@ -262,17 +262,39 @@
                 <p>Employees</p>
               </router-link>
             </li>
+            <!-- Section Administration -->
+            <li class="nav-header">ADMINISTRATION</li>
 
             <li class="nav-item">
+              <router-link to="/admin/companies" class="nav-link">
+                <i class="nav-icon fas fa-building"></i>
+                <p>Companies</p>
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link to="/admin/users" class="nav-link">
+                <i class="nav-icon fas fa-user-cog"></i>
+                <p>Utilisateurs</p>
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link to="/admin/roles" class="nav-link">
+                <i class="nav-icon fas fa-user-shield"></i>
+                <p>Roles</p>
+              </router-link>
+            </li>
+            <li class="nav-item">
               <router-link to="/admin/attendance" class="nav-link">
-                <i class="bi bi-calendar-check"></i>
+                <i class="nav-icon fas fa-calendar-check"></i>
                 <p>Attendance</p>
               </router-link>
             </li>
 
             <li class="nav-item">
               <router-link to="/admin/leaves" class="nav-link">
-                <i class="bi bi-hourglass-split"></i>
+                <i class="nav-icon fas fa-calendar-times"></i>
                 <p>Leaves</p>
               </router-link>
             </li>
@@ -280,7 +302,14 @@
             <li class="nav-item">
               <router-link to="/admin/payroll" class="nav-link">
                 <i class="bi bi-credit-card-2-back"></i>
-                <p>Payroll</p>
+                <p>Payslip</p>
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link to="/admin/positions" class="nav-link">
+                <i class="bi bi-pc-display-horizontal"></i>
+                <p>Positions</p>
               </router-link>
             </li>
 

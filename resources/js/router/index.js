@@ -3,10 +3,14 @@ import Login from '../pages/Login.vue'
 import AdminLayout from "../layouts/AdminLayout.vue"
 import Dashboard from "../pages/Dashboard.vue"
 import Employees from "../pages/Employees/index.vue"
-import Attendance from "../pages/Attendance/index.vue"
-import Leaves from "../pages/Leaves/index.vue"
+import Positions from "../pages/Positions/index.vue"
 import Payroll from "../pages/Payroll/index.vue"
 import Settings from "../pages/Settings/index.vue"
+import Users from "../pages/Users/index.vue"
+import Roles from "../pages/Roles/index.vue"
+import Companies from "../pages/Companies/index.vue"
+import Attendance from '../pages/Attendance/index.vue';
+import Leaves from '../pages/Leaves/index.vue';
 
 
 
@@ -30,6 +34,32 @@ const routes = [
             },
 
             {
+
+                path: 'positions',
+                name: 'positions',
+                component: Positions
+
+            },
+
+            {
+                path: 'users',
+                name: 'users',
+                component: Users
+            },
+
+            {
+                path: 'roles',
+                name: 'roles',
+                component: Roles
+            },
+
+            {
+                path: 'companies',
+                name: 'companies',
+                component: Companies
+            },
+
+            {
                 path: "attendance",
                 component: Attendance,
             },
@@ -47,6 +77,18 @@ const routes = [
             {
                 path: "settings",
                 component: Settings,
+            },
+
+            {
+                path: 'attendance',
+                name: 'attendance',
+                component: Attendance
+            },
+
+            {
+                path: 'leaves',
+                name: 'leaves',
+                component: Leaves
             },
 
 

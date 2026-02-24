@@ -17,8 +17,8 @@ return new class extends Migration
             $table->enum('status', ['present', 'absent', 'late', 'half_day', 'on_leave'])->default('present');
 
             $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
-
-            $table->timestamps();
+            $table->unique(['employee_id', 'date']); // Un seul enregistrement par employé par jour
+            
         });
     }
 
