@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id('overtime_id');
             $table->unsignedBigInteger('employee_id');
             $table->date('date');
-            $table->decimal('hours', 5, 2);                      // Corrigé : DECIMAL pour supporter 1.5h etc.
+            $table->decimal('hour', 5, 2);                      // Corrigé : DECIMAL pour supporter 1.5h etc.
 
             $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
 

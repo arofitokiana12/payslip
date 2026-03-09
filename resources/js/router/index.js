@@ -91,6 +91,11 @@ const routes = [
                 component: Leaves
             },
 
+            { path: 'payroll',
+             name: 'payroll',
+              component: Payroll
+            },
+
 
         ],
     },

@@ -60,7 +60,7 @@ import { useRouter } from 'vue-router'
 const email = ref('')
 const password = ref('')
 const error = ref('')
-const router = useRouter()  // ✅ Pour la redirection
+const router = useRouter()  // Pour la redirection
 
 const loginUser = async () => {
   error.value = ''

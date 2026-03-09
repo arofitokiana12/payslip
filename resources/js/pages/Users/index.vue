@@ -70,8 +70,8 @@
                   Aucun utilisateur trouvé
                 </td>
               </tr>
-              <tr v-for="user in users" :key="user.user_id">
-                <td>{{ user.user_id }}</td>
+              <tr v-for="user in users" :key="user.id">
+                <td>{{ user.id }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.user_name }}</td>
@@ -89,7 +89,7 @@
                 <td>
                   <button
                     class="btn btn-sm btn-info"
-                    @click="viewUser(user.user_id)"
+                    @click="viewUser(user.id)"
                     title="Voir détails"
                   >
                     <i class="fas fa-eye"></i>
@@ -110,7 +110,7 @@
                   </button>
                   <button
                     class="btn btn-sm btn-danger ms-1"
-                    @click="deleteUser(user.user_id)"
+                    @click="deleteUser(user.id)"
                     title="Supprimer"
                   >
                     <i class="fas fa-trash"></i>
@@ -241,7 +241,7 @@
             <table class="table table-bordered">
               <tr>
                 <th width="150">ID</th>
-                <td>{{ selectedUser.user_id }}</td>
+                <td>{{ selectedUser.id }}</td>
               </tr>
               <tr>
                 <th>Nom</th>
@@ -278,7 +278,7 @@
           </div>
         </div>
       </div>
-    </div> 
+    </div>
   </div>
 </template>
 
@@ -298,7 +298,7 @@ export default {
       isEditing: false,
       form: this.getEmptyForm(),
       passwordForm: {
-        user_id: null,
+        id: null,
         password: '',
         password_confirmation: ''
       },
@@ -327,7 +327,7 @@ export default {
   methods: {
     getEmptyForm() {
       return {
-        user_id: null,
+        id: null,
         name: '',
         email: '',
         user_name: '',
@@ -410,7 +410,7 @@ export default {
     editUser(user) {
       this.isEditing = true;
       this.form = {
-        user_id: user.user_id,
+        id: user.id,
         name: user.name,
         email: user.email,
         user_name: user.user_name,
@@ -425,7 +425,7 @@ export default {
 
     openChangePasswordModal(user) {
       this.passwordForm = {
-        user_id: user.user_id,
+        id: user.id,
         password: '',
         password_confirmation: ''
       };
@@ -444,7 +444,7 @@ export default {
           delete data.password;
           delete data.password_confirmation;
 
-          await axios.put(`/users/${this.form.user_id}`, data);
+          await axios.put(`/users/${this.form.id}`, data);
           alert('Utilisateur modifié avec succès');
         } else {
           await axios.post('/users', data);
@@ -476,7 +476,7 @@ export default {
       }
 
       try {
-        await axios.put(`/users/${this.passwordForm.user_id}`, {
+        await axios.put(`/users/${this.passwordForm.id}`, {
           password: this.passwordForm.password,
           password_confirmation: this.passwordForm.password_confirmation
         });
