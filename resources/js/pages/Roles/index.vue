@@ -2,13 +2,13 @@
   <div class="container-fluid mt-4">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Gestion des Rôles</h3>
+        <h3 class="card-title">{{ $t('roles.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-sm btn-secondary me-2" @click="fetchSystemRoles">
-            <i class="fas fa-sync"></i> Rôles Système
+            <i class="fas fa-sync"></i> {{ $t('roles.system_roles') }}
           </button>
           <button class="btn btn-sm btn-primary" @click="openCreateModal">
-            <i class="fas fa-plus"></i> Nouveau Rôle
+            <i class="fas fa-plus"></i> {{ $t('roles.new') }}
           </button>
         </div>
       </div>
@@ -20,7 +20,7 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Rechercher un rôle..."
+              :placeholder="$t('roles.search_placeholder')"
               v-model="search"
             />
           </div>
@@ -29,7 +29,7 @@
         <!-- Loader -->
         <div v-if="loading" class="text-center">
           <div class="spinner-border" role="status">
-            <span class="visually-hidden">Chargement...</span>
+            <span class="visually-hidden">{{ $t('common.loading') }}</span>
           </div>
         </div>
 
@@ -38,16 +38,16 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th width="80">ID</th>
-                <th>Nom</th>
-                <th>Description</th>
-                <th width="200">Actions</th>
+                <th width="80">{{ $t('common.matricule') }}</th>
+                <th>{{ $t('common.name') }}</th>
+                <th>{{ $t('common.description') }}</th>
+                <th width="200">{{ $t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="filteredRoles.length === 0">
                 <td colspan="4" class="text-center text-muted">
-                  Aucun rôle trouvé
+                  {{ $t('roles.no_found') }}
                 </td>
               </tr>
               <tr v-for="role in filteredRoles" :key="role.role_id">
@@ -60,21 +60,21 @@
                   <button
                     class="btn btn-sm btn-info"
                     @click="viewRole(role.role_id)"
-                    title="Voir détails"
+                    :title="$t('common.view_details')"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-warning ms-1"
                     @click="editRole(role)"
-                    title="Modifier"
+                    :title="$t('common.edit')"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-danger ms-1"
                     @click="deleteRole(role.role_id)"
-                    title="Supprimer"
+                    :title="$t('common.delete')"
                   >
                     <i class="fas fa-trash"></i>
                   </button>
@@ -92,43 +92,43 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              {{ isEditing ? 'Modifier le Rôle' : 'Nouveau Rôle' }}
+              {{ isEditing ? $t('roles.edit') : $t('roles.new') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="saveRole">
               <div class="mb-3">
-                <label for="role_name" class="form-label">Nom du Rôle *</label>
+                <label for="role_name" class="form-label">{{ $t('roles.role_name') }} *</label>
                 <input
                   type="text"
                   id="role_name"
                   class="form-control"
                   v-model="form.name"
-                  placeholder="Ex: Manager, Comptable..."
+                  :placeholder="$t('roles.role_name_placeholder')"
                   required
                   autofocus
                 />
               </div>
 
               <div class="mb-3">
-                <label for="role_description" class="form-label">Description</label>
+                <label for="role_description" class="form-label">{{ $t('common.description') }}</label>
                 <textarea
                   id="role_description"
                   class="form-control"
                   v-model="form.description"
                   rows="3"
-                  placeholder="Description du rôle..."
+                  :placeholder="$t('roles.description_placeholder')"
                 ></textarea>
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              <i class="fas fa-times"></i> Annuler
+              <i class="fas fa-times"></i> {{ $t('common.cancel') }}
             </button>
             <button type="button" class="btn btn-primary" @click="saveRole">
-              <i class="fas fa-save"></i> Enregistrer
+              <i class="fas fa-save"></i> {{ $t('common.save') }}
             </button>
           </div>
         </div>
@@ -140,27 +140,29 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Détails du Rôle</h5>
+            <h5 class="modal-title">{{ $t('roles.details') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" v-if="selectedRole">
             <table class="table table-bordered">
-              <tr>
-                <th width="150">ID</th>
-                <td>{{ selectedRole.role_id }}</td>
-              </tr>
-              <tr>
-                <th>Nom</th>
-                <td><span class="badge bg-primary">{{ selectedRole.name }}</span></td>
-              </tr>
-              <tr>
-                <th>Description</th>
-                <td>{{ selectedRole.description || '-' }}</td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th width="150">{{ $t('common.matricule') }}</th>
+                  <td>{{ selectedRole.role_id }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('common.name') }}</th>
+                  <td><span class="badge bg-primary">{{ selectedRole.name }}</span></td>
+                </tr>
+                <tr>
+                  <th>{{ $t('common.description') }}</th>
+                  <td>{{ selectedRole.description || '-' }}</td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>

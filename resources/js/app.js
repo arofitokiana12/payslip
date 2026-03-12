@@ -1,20 +1,19 @@
 import './bootstrap';
-import '../css/premium-theme.css';
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import i18n from './plugins/i18n';
 import "./axios";
 
-
 import $ from 'jquery';
 window.$ = window.jQuery = $;
 
-// 🔹 CSS
+// CSS: Bootstrap + AdminLTE d'abord, puis thème premium en dernier pour priorité
 import "bootstrap/dist/css/bootstrap.min.css";
 import "admin-lte/dist/css/adminlte.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "../css/premium-theme.css";
 
 import "bootstrap/dist/js/bootstrap.bundle.min.js"; // inclut Popper
 

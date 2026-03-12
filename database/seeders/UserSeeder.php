@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'super@payflex.com',
             'password' => Hash::make('password'),
-            'role_id' => 1,
+            'role_id' => null,
             'active' => 1
         ]);
 

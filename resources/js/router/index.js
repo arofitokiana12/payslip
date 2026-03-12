@@ -107,25 +107,12 @@ const router = createRouter({
     routes,
 })
 router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')  // Vérifie si le token existe
+    const token = localStorage.getItem('token');
 
     if (to.meta.requiresAuth && !token) {
-        // Si la route nécessite auth mais pas de token → redirige vers login
-        next({ name: 'Login' })
+        next({ name: 'Login' });
     } else if (to.name === 'Login' && token) {
-        // Si l'utilisateur est déjà connecté et veut aller sur login → dashboard
-        next({ name: 'Dashboard' })
-    } else {
-        // Sinon, continue normalement
-        next()
-    }
-})
-
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem("token");
-
-    if (to.meta.requiresAuth && !token) {
-        next("/login");
+        next({ name: 'Dashboard' });
     } else {
         next();
     }

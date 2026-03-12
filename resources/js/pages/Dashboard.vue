@@ -1,30 +1,19 @@
 <!-- resources/js/pages/Dashboard.vue -->
 <template>
-  <div class="container-fluid mt-4">
+  <div class="container-fluid mt-4 dashboard-page">
     <!-- Header -->
     <div class="dashboard-header mb-4">
       <div class="row align-items-center">
         <div class="col-md-6">
           <h2 class="dashboard-title">
             <i class="fas fa-chart-line"></i>
-            Tableau de Bord
+            {{ $t('dashboard.title') }}
           </h2>
-          <p class="text-muted">Vue d'ensemble de votre système RH</p>
+          <p class="text-muted">{{ $t('dashboard.overview') }}</p>
         </div>
         <div class="col-md-6 text-end">
           <select class="form-select d-inline-block w-auto me-2" v-model="selectedMonth" @change="fetchDashboard">
-            <option value="1">Janvier</option>
-            <option value="2">Février</option>
-            <option value="3">Mars</option>
-            <option value="4">Avril</option>
-            <option value="5">Mai</option>
-            <option value="6">Juin</option>
-            <option value="7">Juillet</option>
-            <option value="8">Août</option>
-            <option value="9">Septembre</option>
-            <option value="10">Octobre</option>
-            <option value="11">Novembre</option>
-            <option value="12">Décembre</option>
+            <option v-for="m in 12" :key="m" :value="m">{{ $t('payroll.month_' + m) }}</option>
           </select>
           <select class="form-select d-inline-block w-auto" v-model="selectedYear" @change="fetchDashboard">
             <option value="2024">2024</option>
@@ -45,7 +34,7 @@
             <p class="mb-0">{{ alert.message }}</p>
           </div>
           <router-link v-if="alert.action" :to="alert.action" class="btn btn-sm btn-outline-primary">
-            Voir
+            {{ $t('dashboard.see') }}
           </router-link>
         </div>
       </div>
@@ -59,11 +48,11 @@
             <i class="fas fa-users"></i>
           </div>
           <div class="stat-content">
-            <div class="stat-label">Employés Actifs</div>
+            <div class="stat-label">{{ $t('dashboard.active_employees') }}</div>
             <div class="stat-value">{{ stats.employees?.active || 0 }}</div>
             <div class="stat-footer">
               <span class="badge bg-success">
-                +{{ stats.employees?.new_this_month || 0 }} ce mois
+                +{{ stats.employees?.new_this_month || 0 }} {{ $t('dashboard.this_month') }}
               </span>
             </div>
           </div>
@@ -76,7 +65,7 @@
             <i class="fas fa-money-bill-wave"></i>
           </div>
           <div class="stat-content">
-            <div class="stat-label">Masse Salariale</div>
+            <div class="stat-label">{{ $t('dashboard.payroll_mass') }}</div>
             <div class="stat-value">{{ formatCurrency(stats.payroll?.total_net || 0) }}</div>
             <div class="stat-footer">
               <span :class="stats.payroll?.variation_percent >= 0 ? 'text-success' : 'text-danger'">
@@ -94,11 +83,11 @@
             <i class="fas fa-calendar-check"></i>
           </div>
           <div class="stat-content">
-            <div class="stat-label">Taux de Présence</div>
+            <div class="stat-label">{{ $t('dashboard.attendance_rate') }}</div>
             <div class="stat-value">{{ stats.attendance?.attendance_rate || 0 }}%</div>
             <div class="stat-footer">
               <span class="text-muted">
-                {{ stats.attendance?.present || 0 }} / {{ stats.attendance?.total_records || 0 }} jours
+                {{ stats.attendance?.present || 0 }} / {{ stats.attendance?.total_records || 0 }} {{ $t('dashboard.days') }}
               </span>
             </div>
           </div>
@@ -111,11 +100,11 @@
             <i class="fas fa-calendar-times"></i>
           </div>
           <div class="stat-content">
-            <div class="stat-label">Congés en Attente</div>
+            <div class="stat-label">{{ $t('dashboard.leaves_pending') }}</div>
             <div class="stat-value">{{ stats.leaves?.pending || 0 }}</div>
             <div class="stat-footer">
               <span class="badge bg-warning">
-                {{ stats.leaves?.total_days || 0 }} jours au total
+                {{ stats.leaves?.total_days || 0 }} {{ $t('dashboard.days_total') }}
               </span>
             </div>
           </div>
@@ -131,7 +120,7 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-chart-line text-primary"></i>
-              Évolution de la Masse Salariale
+              {{ $t('dashboard.payroll_evolution') }}
             </h5>
           </div>
           <div class="card-body">
@@ -146,7 +135,7 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-chart-pie text-success"></i>
-              Présences du Mois
+              {{ $t('dashboard.attendance_month') }}
             </h5>
           </div>
           <div class="card-body">
@@ -164,7 +153,7 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-chart-bar text-warning"></i>
-              Distribution des Congés
+              {{ $t('dashboard.leave_distribution') }}
             </h5>
           </div>
           <div class="card-body">
@@ -179,7 +168,7 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-briefcase text-info"></i>
-              Employés par Poste
+              {{ $t('dashboard.employees_by_position') }}
             </h5>
           </div>
           <div class="card-body">
@@ -197,7 +186,7 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-history text-primary"></i>
-              Activités Récentes
+              {{ $t('dashboard.recent_activities') }}
             </h5>
           </div>
           <div class="card-body">
@@ -219,7 +208,7 @@
 
               <div v-if="recentActivities.length === 0" class="text-center text-muted py-4">
                 <i class="fas fa-inbox fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
-                Aucune activité récente
+                {{ $t('dashboard.no_activity') }}
               </div>
             </div>
           </div>
@@ -232,18 +221,18 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-clipboard-list text-success"></i>
-              Fiches de Paie
+              {{ $t('dashboard.payslip_status') }}
             </h5>
           </div>
           <div class="card-body">
             <div class="quick-stat-item">
-              <div class="quick-stat-label">Brouillons</div>
+              <div class="quick-stat-label">{{ $t('payroll.drafts') }}</div>
               <div class="quick-stat-value text-warning">
                 {{ stats.payroll?.by_status?.draft || 0 }}
               </div>
             </div>
             <div class="quick-stat-item">
-              <div class="quick-stat-label">Finalisées</div>
+              <div class="quick-stat-label">{{ $t('payroll.finalized') }}</div>
               <div class="quick-stat-value text-info">
                 {{ stats.payroll?.by_status?.finalized || 0 }}
               </div>
@@ -261,24 +250,24 @@
           <div class="card-header">
             <h5 class="card-title mb-0">
               <i class="fas fa-chart-pie text-warning"></i>
-              Types de Congés
+              {{ $t('dashboard.leave_types') }}
             </h5>
           </div>
           <div class="card-body">
             <div class="quick-stat-item" v-if="stats.leaves?.by_type">
-              <div class="quick-stat-label">Annuel</div>
+              <div class="quick-stat-label">{{ $t('dashboard.annual') }}</div>
               <div class="quick-stat-value">{{ stats.leaves.by_type.annual || 0 }}</div>
             </div>
             <div class="quick-stat-item" v-if="stats.leaves?.by_type">
-              <div class="quick-stat-label">Maladie</div>
+              <div class="quick-stat-label">{{ $t('dashboard.sick') }}</div>
               <div class="quick-stat-value">{{ stats.leaves.by_type.sick || 0 }}</div>
             </div>
             <div class="quick-stat-item" v-if="stats.leaves?.by_type">
-              <div class="quick-stat-label">Maternité</div>
+              <div class="quick-stat-label">{{ $t('dashboard.maternity') }}</div>
               <div class="quick-stat-value">{{ stats.leaves.by_type.maternity || 0 }}</div>
             </div>
             <div class="quick-stat-item" v-if="stats.leaves?.by_type">
-              <div class="quick-stat-label">Sans solde</div>
+              <div class="quick-stat-label">{{ $t('dashboard.unpaid') }}</div>
               <div class="quick-stat-value">{{ stats.leaves.by_type.unpaid || 0 }}</div>
             </div>
           </div>
@@ -335,11 +324,11 @@ export default {
         const response = await axios.get(`/dashboard?${params.toString()}`);
         const data = response.data;
 
-        this.stats = data.stats;
-        this.charts = data.charts;
-        this.recentActivities = data.recent_activities;
+        this.stats = data?.stats || {};
+        this.charts = data?.charts || {};
+        this.recentActivities = data?.recent_activities || [];
 
-        // Créer les graphiques
+        // Créer les graphiques seulement si on a des données et des refs valides
         this.$nextTick(() => {
           this.createPayrollChart();
           this.createAttendanceChart();
@@ -354,18 +343,26 @@ export default {
     async fetchAlerts() {
       try {
         const response = await axios.get('/dashboard/alerts');
-        this.alerts = response.data.data;
+        const data = response.data?.data ?? response.data;
+        this.alerts = Array.isArray(data) ? data : [];
       } catch (error) {
         console.error('Erreur:', error);
+        this.alerts = [];
       }
     },
 
     createPayrollChart() {
+      if (!this.$refs.payrollChart || !this.charts?.payroll_trend) {
+        return;
+      }
+
       if (this.chartInstances.payroll) {
         this.chartInstances.payroll.destroy();
       }
 
       const ctx = this.$refs.payrollChart.getContext('2d');
+      if (!ctx) return;
+
       this.chartInstances.payroll = new Chart(ctx, {
         type: 'line',
         data: {
@@ -397,43 +394,85 @@ export default {
     },
 
     createAttendanceChart() {
+      if (!this.$refs.attendanceChart || !this.charts?.attendance_overview) {
+        return;
+      }
+
       if (this.chartInstances.attendance) {
         this.chartInstances.attendance.destroy();
       }
 
       const chartData = this.charts.attendance_overview;
-      const colors = chartData?.labels.map(label => chartData.colors[label] || '#999') || [];
+
+      // Palette colorée locale pour le donut de présence
+      const basePalette = {
+        present: '#22c55e',
+        late: '#f97316',
+        absent: '#ef4444',
+        'half-day': '#06b6d4',
+        'half day': '#06b6d4',
+        remote: '#8b5cf6'
+      };
+
+      const labels = chartData?.labels || [];
+      const data = chartData?.data || [];
+
+      const colors = labels.map(label => {
+        const raw = String(label);
+        const key = raw.toLowerCase();
+        if (basePalette[key]) {
+          return basePalette[key];
+        }
+        if (chartData.colors && chartData.colors[raw]) {
+          return chartData.colors[raw];
+        }
+        return '#e5e7eb';
+      });
 
       const ctx = this.$refs.attendanceChart.getContext('2d');
+      if (!ctx) return;
+
       this.chartInstances.attendance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: chartData?.labels || [],
+          labels,
           datasets: [{
-            data: chartData?.data || [],
+            data,
             backgroundColor: colors,
-            borderWidth: 2,
-            borderColor: '#fff'
+            borderWidth: 0,
+            hoverOffset: 6,
+            borderColor: '#ffffff'
           }]
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: 'bottom'
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                boxWidth: 10
+              }
             }
-          }
+          },
+          cutout: '68%'
         }
       });
     },
 
     createLeaveChart() {
+      if (!this.$refs.leaveChart || !this.charts?.leave_distribution) {
+        return;
+      }
+
       if (this.chartInstances.leave) {
         this.chartInstances.leave.destroy();
       }
 
       const ctx = this.$refs.leaveChart.getContext('2d');
+      if (!ctx) return;
+
       this.chartInstances.leave = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -465,11 +504,17 @@ export default {
     },
 
     createPositionChart() {
+      if (!this.$refs.positionChart || !this.charts?.employee_by_position) {
+        return;
+      }
+
       if (this.chartInstances.position) {
         this.chartInstances.position.destroy();
       }
 
       const ctx = this.$refs.positionChart.getContext('2d');
+      if (!ctx) return;
+
       this.chartInstances.position = new Chart(ctx, {
         type: 'bar',
         data: {

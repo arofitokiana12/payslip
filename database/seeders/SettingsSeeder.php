@@ -82,10 +82,13 @@ class SettingsSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            DB::table('settings')->insert(array_merge($setting, [
-                'created_at' => now(),
-                'updated_at' => now()
-            ]));
+            DB::table('settings')->updateOrInsert(
+                ['key' => $setting['key']],
+                array_merge($setting, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])
+            );
         }
     }
 }

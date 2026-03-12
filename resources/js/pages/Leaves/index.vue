@@ -6,7 +6,7 @@
         <div class="small-box bg-info">
           <div class="inner">
             <h3>{{ stats.pending }}</h3>
-            <p>En attente</p>
+            <p>{{ $t('leaves.stats.pending') }}</p>
           </div>
           <div class="icon">
             <i class="fas fa-clock"></i>
@@ -17,7 +17,7 @@
         <div class="small-box bg-success">
           <div class="inner">
             <h3>{{ stats.approved }}</h3>
-            <p>Approuvés</p>
+            <p>{{ $t('leaves.stats.approved') }}</p>
           </div>
           <div class="icon">
             <i class="fas fa-check"></i>
@@ -28,7 +28,7 @@
         <div class="small-box bg-danger">
           <div class="inner">
             <h3>{{ stats.rejected }}</h3>
-            <p>Rejetés</p>
+            <p>{{ $t('leaves.stats.rejected') }}</p>
           </div>
           <div class="icon">
             <i class="fas fa-times"></i>
@@ -39,7 +39,7 @@
         <div class="small-box bg-warning">
           <div class="inner">
             <h3>{{ stats.cancelled }}</h3>
-            <p>Annulés</p>
+            <p>{{ $t('leaves.stats.cancelled') }}</p>
           </div>
           <div class="icon">
             <i class="fas fa-ban"></i>
@@ -51,13 +51,13 @@
     <!-- Carte principale -->
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Gestion des Congés</h3>
+        <h3 class="card-title">{{ $t('leaves.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-sm btn-primary" @click="openCreateModal">
-            <i class="fas fa-plus"></i> Nouvelle Demande
+            <i class="fas fa-plus"></i> {{ $t('leaves.new') }}
           </button>
           <button class="btn btn-sm btn-info ms-2" @click="showPending">
-            <i class="fas fa-list"></i> En attente ({{ stats.pending }})
+            <i class="fas fa-list"></i> {{ $t('leaves.pending_count', { count: stats.pending }) }}
           </button>
         </div>
       </div>
@@ -66,13 +66,13 @@
         <!-- Filtres -->
         <div class="row mb-3">
           <div class="col-md-2">
-            <label class="form-label">Employé</label>
+            <label class="form-label">{{ $t('leaves.employee') }}</label>
             <select
               class="form-select"
               v-model="filters.employee_id"
               @change="applyFilters"
             >
-              <option value="">Tous</option>
+              <option value="">{{ $t('leaves.all') }}</option>
               <option
                 v-for="emp in employees"
                 :key="emp.employee_id"
@@ -83,41 +83,41 @@
             </select>
           </div>
           <div class="col-md-2">
-            <label class="form-label">Type</label>
+            <label class="form-label">{{ $t('leaves.type') }}</label>
             <select
               class="form-select"
               v-model="filters.leave_type"
               @change="applyFilters"
             >
-              <option value="">Tous</option>
-              <option value="annual">Annuel</option>
-              <option value="sick">Maladie</option>
-              <option value="maternity">Maternité</option>
-              <option value="unpaid">Sans solde</option>
-              <option value="other">Autre</option>
+              <option value="">{{ $t('leaves.all_types') }}</option>
+              <option value="annual">{{ $t('leaves.types.annual') }}</option>
+              <option value="sick">{{ $t('leaves.types.sick') }}</option>
+              <option value="maternity">{{ $t('leaves.types.maternity') }}</option>
+              <option value="unpaid">{{ $t('leaves.types.unpaid') }}</option>
+              <option value="other">{{ $t('leaves.types.other') }}</option>
             </select>
           </div>
           <div class="col-md-2">
-            <label class="form-label">Statut</label>
+            <label class="form-label">{{ $t('leaves.status') }}</label>
             <select class="form-select" v-model="filters.status" @change="applyFilters">
-              <option value="">Tous</option>
-              <option value="pending">En attente</option>
-              <option value="approved">Approuvé</option>
-              <option value="rejected">Rejeté</option>
-              <option value="cancelled">Annulé</option>
+              <option value="">{{ $t('leaves.all_statuses') }}</option>
+              <option value="pending">{{ $t('leaves.pending') }}</option>
+              <option value="approved">{{ $t('leaves.approved') }}</option>
+              <option value="rejected">{{ $t('leaves.rejected') }}</option>
+              <option value="cancelled">{{ $t('leaves.cancelled') }}</option>
             </select>
           </div>
           <div class="col-md-2">
-            <label class="form-label">Année</label>
+            <label class="form-label">{{ $t('payroll.year') }}</label>
             <select class="form-select" v-model="filters.year" @change="applyFilters">
-              <option value="">Toutes</option>
+              <option value="">{{ $t('leaves.all_years') }}</option>
               <option value="2024">2024</option>
               <option value="2025">2025</option>
               <option value="2026">2026</option>
             </select>
           </div>
           <div class="col-md-2">
-            <label class="form-label">Date début</label>
+            <label class="form-label">{{ $t('leaves.start_date') }}</label>
             <input
               type="date"
               class="form-control"
@@ -126,7 +126,7 @@
             />
           </div>
           <div class="col-md-2">
-            <label class="form-label">Date fin</label>
+            <label class="form-label">{{ $t('leaves.end_date') }}</label>
             <input
               type="date"
               class="form-control"
@@ -139,7 +139,7 @@
         <div class="row mb-3">
           <div class="col-md-12">
             <button class="btn btn-secondary btn-sm" @click="resetFilters">
-              <i class="fas fa-redo"></i> Réinitialiser
+              <i class="fas fa-redo"></i> {{ $t('common.reset') }}
             </button>
           </div>
         </div>
@@ -154,19 +154,19 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Employé</th>
-                <th>Type</th>
-                <th>Date début</th>
-                <th>Date fin</th>
-                <th>Durée</th>
-                <th>Statut</th>
-                <th>Actions</th>
+                <th>{{ $t('common.matricule') }}</th>
+                <th>{{ $t('leaves.employee') }}</th>
+                <th>{{ $t('leaves.type') }}</th>
+                <th>{{ $t('leaves.start_date') }}</th>
+                <th>{{ $t('leaves.end_date') }}</th>
+                <th>{{ $t('leaves.duration') }}</th>
+                <th>{{ $t('leaves.status') }}</th>
+                <th>{{ $t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="leaves.length === 0">
-                <td colspan="8" class="text-center text-muted">Aucun congé trouvé</td>
+                <td colspan="8" class="text-center text-muted">{{ $t('leaves.no_found') }}</td>
               </tr>
               <tr v-for="leave in leaves" :key="leave.leave_id">
                 <td>{{ leave.leave_id }}</td>
@@ -186,7 +186,7 @@
                 <td>{{ formatDate(leave.start_date) }}</td>
                 <td>{{ formatDate(leave.end_date) }}</td>
                 <td>
-                  <strong>{{ leave.duration_days }} jour(s)</strong>
+                  <strong>{{ leave.duration_days }} {{ $t('common.days') }}</strong>
                 </td>
                 <td>
                   <span :class="getStatusClass(leave.status)">
@@ -197,7 +197,7 @@
                   <button
                     class="btn btn-sm btn-info"
                     @click="viewLeave(leave.leave_id)"
-                    title="Voir détails"
+                    :title="$t('common.view_details')"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -207,14 +207,14 @@
                     <button
                       class="btn btn-sm btn-success ms-1"
                       @click="approveLeave(leave.leave_id)"
-                      title="Approuver"
+                      :title="$t('leaves.approve')"
                     >
                       <i class="fas fa-check"></i>
                     </button>
                     <button
                       class="btn btn-sm btn-danger ms-1"
                       @click="rejectLeave(leave.leave_id)"
-                      title="Rejeter"
+                      :title="$t('leaves.reject')"
                     >
                       <i class="fas fa-times"></i>
                     </button>
@@ -225,7 +225,7 @@
                     v-if="['pending', 'approved'].includes(leave.status)"
                     class="btn btn-sm btn-warning ms-1"
                     @click="editLeave(leave)"
-                    title="Modifier"
+                    :title="$t('common.edit')"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
@@ -235,7 +235,7 @@
                     v-if="['pending', 'approved'].includes(leave.status)"
                     class="btn btn-sm btn-secondary ms-1"
                     @click="cancelLeave(leave.leave_id)"
-                    title="Annuler"
+                    :title="$t('leaves.cancel')"
                   >
                     <i class="fas fa-ban"></i>
                   </button>
@@ -244,7 +244,7 @@
                   <button
                     class="btn btn-sm btn-danger ms-1"
                     @click="deleteLeave(leave.leave_id)"
-                    title="Supprimer"
+                    :title="$t('common.delete')"
                   >
                     <i class="fas fa-trash"></i>
                   </button>
@@ -262,21 +262,21 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              {{ isEditing ? "Modifier le Congé" : "Nouvelle Demande de Congé" }}
+              {{ isEditing ? $t('leaves.edit') : $t('leaves.new') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form>
               <div class="mb-3">
-                <label class="form-label">Employé *</label>
+                <label class="form-label">{{ $t('leaves.employee') }} *</label>
                 <select
                   class="form-select"
                   v-model="form.employee_id"
                   required
                   :disabled="isEditing"
                 >
-                  <option value="">-- Sélectionner --</option>
+                  <option value="">-- {{ $t('common.select') }} --</option>
                   <option
                     v-for="emp in employees"
                     :key="emp.employee_id"
@@ -288,19 +288,19 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Type de congé *</label>
+                <label class="form-label">{{ $t('leaves.leave_type') }} *</label>
                 <select class="form-select" v-model="form.leave_type" required>
-                  <option value="annual">Congé annuel</option>
-                  <option value="sick">Congé maladie</option>
-                  <option value="maternity">Congé maternité</option>
-                  <option value="unpaid">Sans solde</option>
-                  <option value="other">Autre</option>
+                  <option value="annual">{{ $t('leaves.types.annual') }}</option>
+                  <option value="sick">{{ $t('leaves.types.sick') }}</option>
+                  <option value="maternity">{{ $t('leaves.types.maternity') }}</option>
+                  <option value="unpaid">{{ $t('leaves.types.unpaid') }}</option>
+                  <option value="other">{{ $t('leaves.types.other') }}</option>
                 </select>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date début *</label>
+                  <label class="form-label">{{ $t('leaves.start_date') }} *</label>
                   <input
                     type="date"
                     class="form-control"
@@ -310,7 +310,7 @@
                   />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date fin *</label>
+                  <label class="form-label">{{ $t('leaves.end_date') }} *</label>
                   <input
                     type="date"
                     class="form-control"
@@ -323,26 +323,26 @@
 
               <div v-if="calculatedDuration > 0" class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
-                Durée: <strong>{{ calculatedDuration }} jour(s)</strong>
+                {{ $t('leaves.duration_label', { count: calculatedDuration }) }}
               </div>
 
               <div class="mb-3" v-if="isEditing">
-                <label class="form-label">Statut</label>
+                <label class="form-label">{{ $t('leaves.status') }}</label>
                 <select class="form-select" v-model="form.status">
-                  <option value="pending">En attente</option>
-                  <option value="approved">Approuvé</option>
-                  <option value="rejected">Rejeté</option>
-                  <option value="cancelled">Annulé</option>
+                  <option value="pending">{{ $t('leaves.pending') }}</option>
+                  <option value="approved">{{ $t('leaves.approved') }}</option>
+                  <option value="rejected">{{ $t('leaves.rejected') }}</option>
+                  <option value="cancelled">{{ $t('leaves.cancelled') }}</option>
                 </select>
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Annuler
+              {{ $t('common.cancel') }}
             </button>
             <button type="button" class="btn btn-primary" @click="saveLeave">
-              Enregistrer
+              {{ $t('common.save') }}
             </button>
           </div>
         </div>
@@ -354,59 +354,61 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Détails du Congé</h5>
+            <h5 class="modal-title">{{ $t('leaves.details') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body" v-if="selectedLeave">
             <table class="table table-bordered">
-              <tr>
-                <th width="150">ID</th>
-                <td>{{ selectedLeave.leave_id }}</td>
-              </tr>
-              <tr>
-                <th>Employé</th>
-                <td>
-                  {{ selectedLeave.employee?.first_name }}
-                  {{ selectedLeave.employee?.last_name }}
-                  <br />
-                  <small>Matricule: {{ selectedLeave.employee?.matricule }}</small>
-                </td>
-              </tr>
-              <tr>
-                <th>Type</th>
-                <td>
-                  <span :class="getTypeClass(selectedLeave.leave_type)">
-                    {{ getTypeLabel(selectedLeave.leave_type) }}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <th>Date début</th>
-                <td>{{ formatDate(selectedLeave.start_date) }}</td>
-              </tr>
-              <tr>
-                <th>Date fin</th>
-                <td>{{ formatDate(selectedLeave.end_date) }}</td>
-              </tr>
-              <tr>
-                <th>Durée</th>
-                <td>
-                  <strong>{{ selectedLeave.duration_days }} jour(s)</strong>
-                </td>
-              </tr>
-              <tr>
-                <th>Statut</th>
-                <td>
-                  <span :class="getStatusClass(selectedLeave.status)">
-                    {{ getStatusLabel(selectedLeave.status) }}
-                  </span>
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th width="150">{{ $t('common.matricule') }}</th>
+                  <td>{{ selectedLeave.leave_id }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('leaves.employee') }}</th>
+                  <td>
+                    {{ selectedLeave.employee?.first_name }}
+                    {{ selectedLeave.employee?.last_name }}
+                    <br />
+                    <small>Matricule: {{ selectedLeave.employee?.matricule }}</small>
+                  </td>
+                </tr>
+                <tr>
+                  <th>{{ $t('leaves.type') }}</th>
+                  <td>
+                    <span :class="getTypeClass(selectedLeave.leave_type)">
+                      {{ getTypeLabel(selectedLeave.leave_type) }}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>{{ $t('leaves.start_date') }}</th>
+                  <td>{{ formatDate(selectedLeave.start_date) }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('leaves.end_date') }}</th>
+                  <td>{{ formatDate(selectedLeave.end_date) }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('leaves.duration') }}</th>
+                  <td>
+                    <strong>{{ selectedLeave.duration_days }} {{ $t('common.days') }}</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <th>{{ $t('leaves.status') }}</th>
+                  <td>
+                    <span :class="getStatusClass(selectedLeave.status)">
+                      {{ getStatusLabel(selectedLeave.status) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Fermer
+              {{ $t('common.close') }}
             </button>
           </div>
         </div>
@@ -668,14 +670,7 @@ export default {
     },
 
     getTypeLabel(type) {
-      const labels = {
-        annual: "Annuel",
-        sick: "Maladie",
-        maternity: "Maternité",
-        unpaid: "Sans solde",
-        other: "Autre",
-      };
-      return labels[type] || type;
+      return this.$t(`leaves.types.${type}`) || type;
     },
 
     getStatusClass(status) {
@@ -689,13 +684,7 @@ export default {
     },
 
     getStatusLabel(status) {
-      const labels = {
-        pending: "En attente",
-        approved: "Approuvé",
-        rejected: "Rejeté",
-        cancelled: "Annulé",
-      };
-      return labels[status] || status;
+      return this.$t(`leaves.${status}`) || status;
     },
   },
 };

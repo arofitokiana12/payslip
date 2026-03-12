@@ -5,7 +5,7 @@
         <h3 class="card-title">{{ $t('employees.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-primary btn-sm" @click="openCreateModal">
-            <i class="fas fa-plus"></i> Nouvel Employé
+            <i class="fas fa-plus"></i> {{ $t('employees.new') }}
           </button>
         </div>
       </div>
@@ -17,7 +17,7 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Rechercher un employé..."
+              :placeholder="$t('employees.search_placeholder')"
               v-model="search"
             />
           </div>
@@ -33,7 +33,7 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th>{{ $t('employees.id')}}</th>
+                <th>{{ $t('common.matricule') }}</th>
                 <th>{{ $t('employees.last_name')}}</th>
                 <th>{{ $t('employees.first_name')}}</th>
                 <th>{{ $t('employees.position')}}</th>
@@ -78,29 +78,29 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEditing ? 'Modifier' : 'Créer' }} Employé</h5>
+            <h5 class="modal-title">{{ isEditing ? $t('employees.edit') : $t('employees.new') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Prénom *</label>
+                  <label class="form-label">{{ $t('employees.first_name') }} *</label>
                   <input type="text" class="form-control" v-model="form.first_name" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Nom *</label>
+                  <label class="form-label">{{ $t('employees.last_name') }} *</label>
                   <input type="text" class="form-control" v-model="form.last_name" required />
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Matricule *</label>
+                  <label class="form-label">{{ $t('common.matricule') }} *</label>
                   <input type="text" class="form-control" v-model="form.matricule" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Poste *</label>
+                  <label class="form-label">{{ $t('employees.position') }} *</label>
                   <select class="form-select" v-model="form.position_id" required>
                     <option value="">-- Sélectionner --</option>
                     <option v-for="pos in positions" :key="pos.position_id" :value="pos.position_id">
@@ -112,11 +112,11 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date d'embauche *</label>
+                  <label class="form-label">{{ $t('employees.hire_date') }} *</label>
                   <input type="date" class="form-control" v-model="form.hire_date" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Type de Contrat *</label>
+                  <label class="form-label">{{ $t('employees.contract_type') }} *</label>
                   <select class="form-select" v-model="form.contract_type" required>
                     <option value="CDI">CDI</option>
                     <option value="CDD">CDD</option>
@@ -128,18 +128,18 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date fin contrat (si CDD)</label>
+                  <label class="form-label">{{ $t('employees.contract_end_date') }}</label>
                   <input type="date" class="form-control" v-model="form.contract_end_date" />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Salaire de Base *</label>
+                  <label class="form-label">{{ $t('employees.base_salary') }} *</label>
                   <input type="number" step="0.01" class="form-control" v-model="form.base_salary" required />
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Statut</label>
+                  <label class="form-label">{{ $t('employees.status') }}</label>
                   <select class="form-select" v-model="form.status">
                     <option value="active">Actif</option>
                     <option value="inactive">Inactif</option>
@@ -148,7 +148,7 @@
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Actif</label>
+                  <label class="form-label">{{ $t('employees.active') }}</label>
                   <select class="form-select" v-model="form.active">
                     <option :value="true">Oui</option>
                     <option :value="false">Non</option>
@@ -158,8 +158,8 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" @click="saveEmployee">Enregistrer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.cancel') }}</button>
+            <button type="button" class="btn btn-primary" @click="saveEmployee">{{ $t('common.save') }}</button>
           </div>
         </div>
       </div>

@@ -6,13 +6,13 @@
         <div class="card bg-primary text-white">
           <div class="card-body">
             <h4 class="card-title">
-              <i class="fas fa-clock"></i> Pointage Rapide
+              <i class="fas fa-clock"></i> {{ $t('attendance.quick_check') }}
             </h4>
             <div class="row">
               <div class="col-md-6">
-                <label class="form-label">Sélectionner un employé</label>
+                <label class="form-label">{{ $t('attendance.select_employee') }}</label>
                 <select class="form-select" v-model="quickCheckEmployee">
-                  <option value="">-- Choisir --</option>
+                  <option value="">-- {{ $t('common.select') }} --</option>
                   <option v-for="emp in employees" :key="emp.employee_id" :value="emp.employee_id">
                     {{ emp.first_name }} {{ emp.last_name }} ({{ emp.matricule }})
                   </option>
@@ -24,14 +24,14 @@
                   @click="quickCheckIn"
                   :disabled="!quickCheckEmployee"
                 >
-                  <i class="fas fa-sign-in-alt"></i> Arrivée
+                  <i class="fas fa-sign-in-alt"></i> {{ $t('attendance.arrival') }}
                 </button>
                 <button
                   class="btn btn-warning"
                   @click="quickCheckOut"
                   :disabled="!quickCheckEmployee"
                 >
-                  <i class="fas fa-sign-out-alt"></i> Départ
+                  <i class="fas fa-sign-out-alt"></i> {{ $t('attendance.departure') }}
                 </button>
               </div>
             </div>
@@ -43,10 +43,10 @@
     <!-- Carte principale -->
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Gestion des Présences</h3>
+        <h3 class="card-title">{{ $t('attendance.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-sm btn-primary" @click="openCreateModal">
-            <i class="fas fa-plus"></i> Nouvelle Présence
+            <i class="fas fa-plus"></i> {{ $t('attendance.new') }}
           </button>
         </div>
       </div>
@@ -55,16 +55,16 @@
         <!-- Filtres -->
         <div class="row mb-3">
           <div class="col-md-3">
-            <label class="form-label">Employé</label>
+            <label class="form-label">{{ $t('attendance.employee') }}</label>
             <select class="form-select" v-model="filters.employee_id" @change="applyFilters">
-              <option value="">Tous les employés</option>
+              <option value="">{{ $t('attendance.all_employees') }}</option>
               <option v-for="emp in employees" :key="emp.employee_id" :value="emp.employee_id">
                 {{ emp.first_name }} {{ emp.last_name }}
               </option>
             </select>
           </div>
           <div class="col-md-2">
-            <label class="form-label">Date</label>
+            <label class="form-label">{{ $t('attendance.date') }}</label>
             <input
               type="date"
               class="form-control"
@@ -73,7 +73,7 @@
             />
           </div>
           <div class="col-md-2">
-            <label class="form-label">Date Début</label>
+            <label class="form-label">{{ $t('leaves.start_date') }}</label>
             <input
               type="date"
               class="form-control"
@@ -82,7 +82,7 @@
             />
           </div>
           <div class="col-md-2">
-            <label class="form-label">Date Fin</label>
+            <label class="form-label">{{ $t('leaves.end_date') }}</label>
             <input
               type="date"
               class="form-control"
@@ -91,14 +91,14 @@
             />
           </div>
           <div class="col-md-2">
-            <label class="form-label">Statut</label>
+            <label class="form-label">{{ $t('attendance.status') }}</label>
             <select class="form-select" v-model="filters.status" @change="applyFilters">
-              <option value="">Tous</option>
-              <option value="Present">Présent</option>
-              <option value="Late">En retard</option>
-              <option value="Absent">Absent</option>
-              <option value="Half-day">Demi-journée</option>
-              <option value="Remote">Télétravail</option>
+              <option value="">{{ $t('attendance.all') }}</option>
+              <option value="Present">{{ $t('attendance.present') }}</option>
+              <option value="Late">{{ $t('attendance.late') }}</option>
+              <option value="Absent">{{ $t('attendance.absent') }}</option>
+              <option value="Half-day">{{ $t('attendance.half_day') }}</option>
+              <option value="Remote">{{ $t('attendance.remote') }}</option>
             </select>
           </div>
           <div class="col-md-1 d-flex align-items-end">
@@ -118,20 +118,20 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th>Matricule</th>
-                <th>Employé</th>
-                <th>Date</th>
-                <th>Arrivée</th>
-                <th>Départ</th>
-                <th>Durée</th>
-                <th>Statut</th>
-                <th>Actions</th>
+                <th>{{ $t('common.matricule') }}</th>
+                <th>{{ $t('attendance.employee') }}</th>
+                <th>{{ $t('attendance.date') }}</th>
+                <th>{{ $t('attendance.arrival') }}</th>
+                <th>{{ $t('attendance.departure') }}</th>
+                <th>{{ $t('attendance.duration') }}</th>
+                <th>{{ $t('attendance.status') }}</th>
+                <th>{{ $t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="attendances.length === 0">
                 <td colspan="8" class="text-center text-muted">
-                  Aucune présence trouvée
+                  {{ $t('attendance.no_found') }}
                 </td>
               </tr>
               <tr v-for="att in attendances" :key="att.attendance_id">
@@ -192,16 +192,16 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              {{ isEditing ? 'Modifier la Présence' : 'Nouvelle Présence' }}
+              {{ isEditing ? $t('attendance.edit') : $t('attendance.new') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form>
               <div class="mb-3">
-                <label class="form-label">Employé *</label>
+                <label class="form-label">{{ $t('attendance.employee') }} *</label>
                 <select class="form-select" v-model="form.employee_id" required :disabled="isEditing">
-                  <option value="">-- Sélectionner --</option>
+                  <option value="">-- {{ $t('common.select') }} --</option>
                   <option v-for="emp in employees" :key="emp.employee_id" :value="emp.employee_id">
                     {{ emp.first_name }} {{ emp.last_name }} ({{ emp.matricule }})
                   </option>
@@ -209,7 +209,7 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Date *</label>
+                <label class="form-label">{{ $t('attendance.date') }} *</label>
                 <input
                   type="date"
                   class="form-control"
@@ -221,7 +221,7 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Heure d'arrivée *</label>
+                  <label class="form-label">{{ $t('attendance.check_in') }} *</label>
                   <input
                     type="time"
                     class="form-control"
@@ -230,7 +230,7 @@
                   />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Heure de départ</label>
+                  <label class="form-label">{{ $t('attendance.check_out') }}</label>
                   <input
                     type="time"
                     class="form-control"
@@ -240,20 +240,20 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Statut *</label>
+                <label class="form-label">{{ $t('attendance.status') }} *</label>
                 <select class="form-select" v-model="form.status" required>
-                  <option value="Present">Présent</option>
-                  <option value="Late">En retard</option>
-                  <option value="Absent">Absent</option>
-                  <option value="Half-day">Demi-journée</option>
-                  <option value="Remote">Télétravail</option>
+                  <option value="Present">{{ $t('attendance.present') }}</option>
+                  <option value="Late">{{ $t('attendance.late') }}</option>
+                  <option value="Absent">{{ $t('attendance.absent') }}</option>
+                  <option value="Half-day">{{ $t('attendance.half_day') }}</option>
+                  <option value="Remote">{{ $t('attendance.remote') }}</option>
                 </select>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" @click="saveAttendance">Enregistrer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.cancel') }}</button>
+            <button type="button" class="btn btn-primary" @click="saveAttendance">{{ $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -264,52 +264,54 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Détails de la Présence</h5>
+            <h5 class="modal-title">{{ $t('attendance.details') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body" v-if="selectedAttendance">
             <table class="table table-bordered">
-              <tr>
-                <th>ID</th>
-                <td>{{ selectedAttendance.attendance_id }}</td>
-              </tr>
-              <tr>
-                <th>Employé</th>
-                <td>
-                  {{ selectedAttendance.employee?.first_name }}
-                  {{ selectedAttendance.employee?.last_name }}
-                  <br>
-                  <small>Matricule: {{ selectedAttendance.employee?.matricule }}</small>
-                </td>
-              </tr>
-              <tr>
-                <th>Date</th>
-                <td>{{ formatDate(selectedAttendance.date) }}</td>
-              </tr>
-              <tr>
-                <th>Arrivée</th>
-                <td>{{ formatTime(selectedAttendance.check_in) }}</td>
-              </tr>
-              <tr>
-                <th>Départ</th>
-                <td>{{ selectedAttendance.check_out ? formatTime(selectedAttendance.check_out) : 'Pas encore parti' }}</td>
-              </tr>
-              <tr>
-                <th>Durée</th>
-                <td>{{ calculateDuration(selectedAttendance.check_in, selectedAttendance.check_out) }}</td>
-              </tr>
-              <tr>
-                <th>Statut</th>
-                <td>
-                  <span :class="getStatusClass(selectedAttendance.status)">
-                    {{ getStatusLabel(selectedAttendance.status) }}
-                  </span>
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th>{{ $t('common.matricule') }}</th>
+                  <td>{{ selectedAttendance.attendance_id }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('attendance.employee') }}</th>
+                  <td>
+                    {{ selectedAttendance.employee?.first_name }}
+                    {{ selectedAttendance.employee?.last_name }}
+                    <br>
+                    <small>Matricule: {{ selectedAttendance.employee?.matricule }}</small>
+                  </td>
+                </tr>
+                <tr>
+                  <th>{{ $t('attendance.date') }}</th>
+                  <td>{{ formatDate(selectedAttendance.date) }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('attendance.arrival') }}</th>
+                  <td>{{ formatTime(selectedAttendance.check_in) }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('attendance.departure') }}</th>
+                  <td>{{ selectedAttendance.check_out ? formatTime(selectedAttendance.check_out) : $t('attendance.not_departed') }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('attendance.duration') }}</th>
+                  <td>{{ calculateDuration(selectedAttendance.check_in, selectedAttendance.check_out) }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('attendance.status') }}</th>
+                  <td>
+                    <span :class="getStatusClass(selectedAttendance.status)">
+                      {{ getStatusLabel(selectedAttendance.status) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>
@@ -540,14 +542,8 @@ export default {
     },
 
     getStatusLabel(status) {
-      const labels = {
-        'Present': 'Présent',
-        'Late': 'En retard',
-        'Absent': 'Absent',
-        'Half-day': 'Demi-journée',
-        'Remote': 'Télétravail'
-      };
-      return labels[status] || status;
+      const key = { 'Present': 'present', 'Late': 'late', 'Absent': 'absent', 'Half-day': 'half_day', 'Remote': 'remote' }[status];
+      return key ? this.$t(`attendance.${key}`) : status;
     }
   }
 };

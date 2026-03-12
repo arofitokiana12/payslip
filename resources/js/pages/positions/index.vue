@@ -2,10 +2,10 @@
   <div class="container-fluid mt-4">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Positions</h3>
+        <h3 class="card-title">{{ $t('positions.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-primary btn-sm" @click="openCreateModal">
-            <i class="fas fa-plus"></i> New position
+            <i class="fas fa-plus"></i> {{ $t('positions.new') }}
           </button>
         </div>
       </div>
@@ -14,7 +14,7 @@
         <!-- Loader -->
         <div v-if="loading" class="text-center">
           <div class="spinner-border" role="status">
-            <span class="visually-hidden">Chargement...</span>
+            <span class="visually-hidden">{{ $t('common.loading') }}</span>
           </div>
         </div>
 
@@ -22,9 +22,9 @@
         <table v-else class="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Position name</th>
-              <th>Actions</th>
+              <th>{{ $t('common.matricule') }}</th>
+              <th>{{ $t('positions.position_name') }}</th>
+              <th>{{ $t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,13 +33,13 @@
               <td>{{ position.position_name }}</td>
               <td>
                 <button class="btn btn-sm btn-info" @click="editPosition(position)">
-                  <i class="fas fa-edit"></i> Modifier
+                  <i class="fas fa-edit"></i> {{ $t('common.edit') }}
                 </button>
                 <button
                   class="btn btn-sm btn-danger ms-1"
                   @click="deletePosition(position.position_id)"
                 >
-                  <i class="fas fa-trash"></i> Supprimer
+                  <i class="fas fa-trash"></i> {{ $t('common.delete') }}
                 </button>
               </td>
             </tr>
@@ -53,13 +53,13 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEditing ? "Modifier" : "Créer" }} Poste</h5>
+            <h5 class="modal-title">{{ isEditing ? $t('positions.edit') : $t('positions.create') }} {{ $t('nav.positions') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="savePosition">
               <div class="mb-3">
-                <label class="form-label">Nom du Poste</label>
+                <label class="form-label">{{ $t('positions.position_name') }}</label>
                 <input
                   type="text"
                   class="form-control"
@@ -75,10 +75,10 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Annuler
+              {{ $t('common.cancel') }}
             </button>
             <button type="button" class="btn btn-primary" @click="savePosition">
-              Enregistrer
+              {{ $t('common.save') }}
             </button>
           </div>
         </div>

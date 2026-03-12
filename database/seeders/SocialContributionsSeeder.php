@@ -31,10 +31,13 @@ class SocialContributionsSeeder extends Seeder
         ];
 
         foreach ($contributions as $contribution) {
-            DB::table('social_contributions')->insert(array_merge($contribution, [
-                'created_at' => now(),
-                'updated_at' => now()
-            ]));
+            DB::table('social_contributions')->updateOrInsert(
+                ['code' => $contribution['code']],
+                array_merge($contribution, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])
+            );
         }
     }
 }

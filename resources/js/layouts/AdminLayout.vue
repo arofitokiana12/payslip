@@ -1,208 +1,136 @@
 <template>
   <div class="app-wrapper">
-    <!-- Navbar -->
-    <nav class="app-header navbar navbar-expand bg-body">
-      <!--begin::Container-->
-      <div class="container-fluid">
-        <!--begin::Start Navbar Links-->
+    <!-- Navbar premium -->
+    <nav class="app-header navbar navbar-expand">
+      <div class="container-fluid px-4">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-              <i class="bi bi-list"></i>
-              <!-- CORRECTION ICI -->
+            <a class="nav-link d-flex align-items-center" data-lte-toggle="sidebar" href="#" role="button" aria-label="Toggle sidebar">
+              <i class="bi bi-list fs-4"></i>
             </a>
           </li>
-
-          <ul class="navbar-nav ms-auto"></ul>
         </ul>
-        <!--end::Start Navbar Links-->
-        <!--begin::End Navbar Links-->
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center gap-2">
           <li class="nav-item">
             <LanguageSwitcher />
           </li>
-          <!--end::Navbar Search-->
-
-          <!--begin::Fullscreen Toggle-->
           <li class="nav-item">
-            <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+            <a class="nav-link px-3" href="#" data-lte-toggle="fullscreen" aria-label="Fullscreen">
               <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-              <i
-                data-lte-icon="minimize"
-                class="bi bi-fullscreen-exit"
-                style="display: none"
-              ></i>
+              <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
             </a>
           </li>
-          <!--end::Fullscreen Toggle-->
-          <!--begin::User Menu Dropdown-->
-          <li class="nav-item dropdown user-menu">
-            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-              <!-- <img
-                src="./assets/img/user2-160x160.jpg"
-                class="user-image rounded-circle shadow"
-                alt="User Image"
-              /> -->
-              <i class="bi bi-person-circle"></i>
-
-              <span class="d-none d-md-inline"> SuperAdmin</span>
+          <li class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2 py-2 px-3 rounded-3" data-bs-toggle="dropdown" id="userDropdown">
+              <span class="user-avatar-sm">
+                <i class="bi bi-person-fill"></i>
+              </span>
+              <span class="d-none d-md-inline text-dark fw-semibold">SuperAdmin</span>
+              <i class="bi bi-chevron-down small"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-              <!--begin::User Image-->
-              <li class="user-header text-bg-primary">
-                <!-- <img
-                  src="./assets/img/user2-160x160.jpg"
-                  class="rounded-circle shadow"
-                  alt="User Image"
-                /> -->
-                <p>
-                  Alexander Pierce - Web Developer
-                  <small>Member since Nov. 2023</small>
-                </p>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2" style="min-width: 220px; border-radius: 12px;">
+              <li class="px-3 py-2 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="user-avatar-sm"><i class="bi bi-person-fill"></i></span>
+                  <div>
+                    <div class="fw-semibold">Super Admin</div>
+                    <small class="text-muted">{{ $t('layout.admin_account') }}</small>
+                  </div>
+                </div>
               </li>
-              <!--end::User Image-->
-              <!--begin::Menu Body-->
-              <li class="user-body">
-
-              </li>
-              <!--end::Menu Body-->
-              <!--begin::Menu Footer-->
-              <li class="nav-item">
-                <a class="nav-link text-danger" @click="logout">
-                  <i class="bi bi-box-arrow-right"></i> Logout
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#" @click.prevent="logout">
+                  <i class="bi bi-box-arrow-right text-danger"></i>
+                  <span>{{ $t('nav.logout') }}</span>
                 </a>
               </li>
-              <!--end::Menu Footer-->
             </ul>
           </li>
-          <!--end::User Menu Dropdown-->
         </ul>
-        <!--end::End Navbar Links-->
       </div>
-      <!--end::Container-->
     </nav>
 
-    <!-- Sidebar -->
-    <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-      <!--begin::Sidebar Brand-->
-      <div class="sidebar-brand">
-        <!--begin::Brand Link-->
-        <a href="./index.html" class="brand-link">
-          <!--begin::Brand Image-->
-          <!-- <img
-            src="./assets/img/AdminLTELogo.png"
-            alt="AdminLTE Logo"
-            class="brand-image opacity-75 shadow"
-          /> -->
-          <!--end::Brand Image-->
-          <!--begin::Brand Text-->
-          <span class="brand-text fw-light">PayFlex</span>
-          <!--end::Brand Text-->
-        </a>
-        <!--end::Brand Link-->
-      </div>
-      <!--end::Sidebar Brand-->
-      <!--begin::Sidebar Wrapper-->
-      <div class="sidebar-wrapper">
-        <nav class="mt-2">
-          <!--begin::Sidebar Menu-->
-          <ul
-            class="nav sidebar-menu flex-column"
-            data-lte-toggle="treeview"
-            role="navigation"
-            aria-label="Main navigation"
-            data-accordion="false"
-            id="navigation"
-          >
-            <li class="nav-item">
-              <router-link to="/admin/dashboard" class="nav-link">
-                <i class="bi bi-speedometer2"></i>
-                <p>Dashboard</p>
-              </router-link>
-            </li>
+    <!-- Corps: sidebar + contenu côte à côte -->
+    <div class="app-body">
+      <aside class="app-sidebar shadow" data-bs-theme="dark">
+        <div class="sidebar-brand">
+          <router-link to="/admin/dashboard" class="brand-link text-decoration-none">
+            <span class="brand-text">PayFlex</span>
+          </router-link>
+        </div>
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <ul class="nav sidebar-menu flex-column" role="navigation" id="navigation">
+              <li class="nav-item">
+                <router-link to="/admin/dashboard" class="nav-link">
+                  <i class="bi bi-speedometer2"></i>
+                  <p>{{ $t('nav.dashboard') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/employees" class="nav-link">
+                  <i class="bi bi-people"></i>
+                  <p>{{ $t('nav.employees') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/payroll" class="nav-link">
+                  <i class="bi bi-wallet2"></i>
+                  <p>{{ $t('nav.payroll') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-header">{{ $t('nav.administration') }}</li>
+              <li class="nav-item">
+                <router-link to="/admin/companies" class="nav-link">
+                  <i class="bi bi-building"></i>
+                  <p>{{ $t('nav.companies') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/users" class="nav-link">
+                  <i class="bi bi-person-gear"></i>
+                  <p>{{ $t('nav.users') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/roles" class="nav-link">
+                  <i class="bi bi-shield-lock"></i>
+                  <p>{{ $t('nav.roles') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/attendance" class="nav-link">
+                  <i class="bi bi-calendar-check"></i>
+                  <p>{{ $t('nav.attendance') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/leaves" class="nav-link">
+                  <i class="bi bi-calendar-x"></i>
+                  <p>{{ $t('nav.leaves') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/positions" class="nav-link">
+                  <i class="bi bi-briefcase"></i>
+                  <p>{{ $t('nav.positions') }}</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/admin/settings" class="nav-link">
+                  <i class="bi bi-gear"></i>
+                  <p>{{ $t('nav.settings') }}</p>
+                </router-link>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
 
-            <li class="nav-item">
-              <router-link to="/admin/employees" class="nav-link">
-                <i class="bi bi-people"></i>
-                <p>Employees</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/payroll" class="nav-link">
-                <i class="nav-icon fas fa-money-bill-wave"></i>
-                <p>Paie</p>
-              </router-link>
-            </li>
-
-            <!-- Section Administration -->
-            <li class="nav-header">ADMINISTRATION</li>
-
-            <li class="nav-item">
-              <router-link to="/admin/companies" class="nav-link">
-                <i class="nav-icon fas fa-building"></i>
-                <p>Companies</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/users" class="nav-link">
-                <i class="nav-icon fas fa-user-cog"></i>
-                <p>Utilisateurs</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/roles" class="nav-link">
-                <i class="nav-icon fas fa-user-shield"></i>
-                <p>Roles</p>
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/admin/attendance" class="nav-link">
-                <i class="nav-icon fas fa-calendar-check"></i>
-                <p>Attendance</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/leaves" class="nav-link">
-                <i class="nav-icon fas fa-calendar-times"></i>
-                <p>Leaves</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/payroll" class="nav-link">
-                <i class="bi bi-credit-card-2-back"></i>
-                <p>Payslip</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/positions" class="nav-link">
-                <i class="bi bi-pc-display-horizontal"></i>
-                <p>Positions</p>
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link to="/admin/settings" class="nav-link">
-                <i class="bi bi-gear"></i>
-                <p>Settings</p>
-              </router-link>
-            </li>
-          </ul>
-          <!--end::Sidebar Menu-->
-        </nav>
-      </div>
-      <!--end::Sidebar Wrapper-->
-    </aside>
-
-    <!-- Main content -->
-    <main class="app-main">
-      <router-view />
-    </main>
+      <main class="app-main content-premium">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
