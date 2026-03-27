@@ -15,8 +15,10 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
+        $user = $request->user();
+
         // Vérifie si l'utilisateur est connecté et si son rôle est dans la liste
-        if (!$request->user() || !$request->user()->hasRole($roles)) {
+        if (!$user || !$user->hasRole($roles)) {
             return response()->json(['message' => 'Accès interdit.'], 403);
         }
 

@@ -60,11 +60,21 @@ class User extends Authenticatable
             return false;
         }
 
+        $currentRole = $this->normalizeRoleName($this->role->name);
+
         if (is_array($roles)) {
-            return in_array(strtolower($this->role->name), array_map('strtolower', $roles));
+            $normalizedRoles = array_map(fn ($role) => $this->normalizeRoleName($role), $roles);
+            return in_array($currentRole, $normalizedRoles, true);
         }
 
-        return strtolower($this->role->name) === strtolower($roles);
+        return $currentRole === $this->normalizeRoleName($roles);
+    }
+
+    private function normalizeRoleName(string $role): string
+    {
+        $normalized = strtolower(trim($role));
+        $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized);
+        return trim($normalized ?? '', '_');
     }
 
     /**
