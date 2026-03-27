@@ -120,6 +120,27 @@
             </tbody>
           </table>
         </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} utilisateur(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              :disabled="pagination.current_page <= 1 || loading"
+              @click="changePage(pagination.current_page - 1)"
+            >
+              Precedent
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              :disabled="pagination.current_page >= pagination.last_page || loading"
+              @click="changePage(pagination.current_page + 1)"
+            >
+              Suivant
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -310,6 +331,12 @@ export default {
         company_id: '',
         active: ''
       },
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       modal: null,
       passwordModal: null,
       detailModal: null,
@@ -354,10 +381,16 @@ export default {
         if (this.filters.role_id) params.append('role_id', this.filters.role_id);
         if (this.filters.company_id) params.append('company_id', this.filters.company_id);
         if (this.filters.active !== '') params.append('active', this.filters.active);
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
 
         const response = await axios.get(`/users?${params.toString()}`);
-        const data = response.data?.data ?? response.data;
+        const data = response.data?.data ?? [];
         this.users = Array.isArray(data) ? data : [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des utilisateurs');
@@ -368,7 +401,7 @@ export default {
 
     async fetchRoles() {
       try {
-        const response = await axios.get('/roles');
+        const response = await axios.get('/roles?per_page=1000');
         const data = response.data?.data ?? response.data;
         this.roles = Array.isArray(data) ? data : [];
       } catch (error) {
@@ -378,7 +411,7 @@ export default {
 
     async fetchCompanies() {
       try {
-        const response = await axios.get('/companies');
+        const response = await axios.get('/companies?per_page=1000');
         const data = response.data?.data ?? response.data;
         this.companies = Array.isArray(data) ? data : [];
       } catch (error) {
@@ -398,6 +431,7 @@ export default {
     },
 
     applyFilters() {
+      this.pagination.current_page = 1;
       this.fetchUsers();
     },
 
@@ -408,6 +442,12 @@ export default {
         company_id: '',
         active: ''
       };
+      this.pagination.current_page = 1;
+      this.fetchUsers();
+    },
+
+    changePage(page) {
+      this.pagination.current_page = page;
       this.fetchUsers();
     },
 

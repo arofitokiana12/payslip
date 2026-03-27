@@ -83,6 +83,15 @@
             </tbody>
           </table>
         </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} role(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -182,6 +191,12 @@ export default {
       roles: [],
       loading: false,
       search: '',
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       isEditing: false,
       form: this.getEmptyForm(),
       modal: null,
@@ -221,8 +236,15 @@ export default {
     async fetchRoles() {
       this.loading = true;
       try {
-        const response = await axios.get('/roles');
-        this.roles = response.data.data || response.data;
+        const params = new URLSearchParams();
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
+        const response = await axios.get(`/roles?${params.toString()}`);
+        this.roles = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des rôles');
@@ -316,6 +338,10 @@ export default {
         console.error('Erreur:', error);
         alert(error.response?.data?.message || 'Erreur lors de la suppression');
       }
+    },
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchRoles();
     }
   }
 };

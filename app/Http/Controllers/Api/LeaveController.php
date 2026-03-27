@@ -42,10 +42,18 @@ class LeaveController extends Controller
             $query->whereYear('start_date', $request->year);
         }
 
-        $leaves = $query->orderBy('start_date', 'desc')->get();
+        $leaves = $query
+            ->orderBy('start_date', 'desc')
+            ->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $leaves
+            'data' => $leaves->items(),
+            'meta' => [
+                'current_page' => $leaves->currentPage(),
+                'per_page' => $leaves->perPage(),
+                'total' => $leaves->total(),
+                'last_page' => $leaves->lastPage(),
+            ],
         ]);
     }
 

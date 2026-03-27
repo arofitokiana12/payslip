@@ -8,12 +8,19 @@ use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $companies = Company::where('active', true)->get();
+        $companies = Company::where('active', true)
+            ->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $companies
+            'data' => $companies->items(),
+            'meta' => [
+                'current_page' => $companies->currentPage(),
+                'per_page' => $companies->perPage(),
+                'total' => $companies->total(),
+                'last_page' => $companies->lastPage(),
+            ],
         ]);
     }
 

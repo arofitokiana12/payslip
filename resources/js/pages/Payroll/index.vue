@@ -7,10 +7,10 @@
         <h3 class="card-title">💰 {{ $t('payroll.title') }}</h3>
         <div class="card-tools">
           <div class="d-flex gap-3 align-items-center">
-            <select class="form-select" v-model="selectedMonth" @change="fetchPayslips">
+            <select class="form-select" v-model="selectedMonth" @change="onPeriodChange">
               <option v-for="m in 12" :key="m" :value="m">{{ $t('payroll.month_' + m) }}</option>
             </select>
-            <select class="form-select" v-model="selectedYear" @change="fetchPayslips">
+            <select class="form-select" v-model="selectedYear" @change="onPeriodChange">
               <option value="2024">2024</option>
               <option value="2025">2025</option>
               <option value="2026">2026</option>
@@ -217,6 +217,15 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} fiche(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
         </div>
       </div>
     </div>
@@ -508,6 +517,12 @@ export default {
       selectedYear: new Date().getFullYear(),
       filterEmployee: "",
       filterStatus: "",
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1,
+      },
 
       generateMode: "all",
       generateForm: {
@@ -526,11 +541,7 @@ export default {
 
   computed: {
     filteredPayslips() {
-      return this.payslips.filter((p) => {
-        if (this.filterEmployee && p.employee_id != this.filterEmployee) return false;
-        if (this.filterStatus && p.status !== this.filterStatus) return false;
-        return true;
-      });
+      return this.payslips;
     },
 
     totalGross() {
@@ -550,6 +561,11 @@ export default {
   },
 
   methods: {
+    onPeriodChange() {
+      this.pagination.current_page = 1;
+      this.fetchPayslips();
+    },
+
     async fetchPayslips() {
       this.loading = true;
       try {
@@ -557,8 +573,16 @@ export default {
           month: this.selectedMonth,
           year: this.selectedYear,
         });
+        if (this.filterEmployee) params.append("employee_id", this.filterEmployee);
+        if (this.filterStatus) params.append("status", this.filterStatus);
+        params.append("page", this.pagination.current_page);
+        params.append("per_page", this.pagination.per_page);
         const response = await axios.get(`/payroll/payslips?${params.toString()}`);
-        this.payslips = response.data.data || response.data;
+        this.payslips = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {}),
+        };
       } catch (error) {
         console.error("Erreur:", error);
         alert("Erreur lors du chargement");
@@ -569,7 +593,7 @@ export default {
 
     async fetchEmployees() {
       try {
-        const response = await axios.get("/employees");
+        const response = await axios.get("/employees?per_page=1000");
         this.employees = response.data.data || response.data;
       } catch (error) {
         console.error("Erreur:", error);
@@ -577,7 +601,13 @@ export default {
     },
 
     applyFilters() {
-      // Les filtres sont appliqués via computed property
+      this.pagination.current_page = 1;
+      this.fetchPayslips();
+    },
+
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchPayslips();
     },
 
     showGenerateModal() {

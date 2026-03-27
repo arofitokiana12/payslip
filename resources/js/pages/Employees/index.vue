@@ -19,6 +19,7 @@
               class="form-control"
               :placeholder="$t('employees.search_placeholder')"
               v-model="search"
+              @input="applyFilters"
             />
           </div>
         </div>
@@ -45,7 +46,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="employee in filteredEmployees" :key="employee.employee_id">
+              <tr v-if="employees.length === 0">
+                <td colspan="9" class="text-center text-muted">{{ $t('employees.no_found') }}</td>
+              </tr>
+              <tr v-for="employee in employees" :key="employee.employee_id">
                 <td>{{ employee.matricule }}</td>
                 <td>{{ employee.last_name }}</td>
                 <td>{{ employee.first_name }}</td>
@@ -69,6 +73,15 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} employe(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
         </div>
       </div>
     </div>
@@ -179,22 +192,16 @@ export default {
       positions: [],
       loading: false,
       search: '',
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       isEditing: false,
       form: this.getEmptyForm(),
       modal: null
     };
-  },
-
-  computed: {
-    filteredEmployees() {
-      if (!this.search) return this.employees;
-      const searchLower = this.search.toLowerCase();
-      return this.employees.filter(emp =>
-        emp.first_name.toLowerCase().includes(searchLower) ||
-        emp.last_name.toLowerCase().includes(searchLower) ||
-        emp.matricule.toString().includes(searchLower)
-      );
-    }
   },
 
   mounted() {
@@ -224,8 +231,17 @@ export default {
     async fetchEmployees() {
       this.loading = true;
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/employees');
-        this.employees = response.data.data || response.data;
+        const params = new URLSearchParams();
+        if (this.search) params.append('search', this.search);
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
+
+        const response = await axios.get(`/employees?${params.toString()}`);
+        this.employees = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des employés');
@@ -236,11 +252,21 @@ export default {
 
     async fetchPositions() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/positions');
+        const response = await axios.get('/positions?per_page=1000');
         this.positions = response.data.data || response.data;
       } catch (error) {
         console.error('Erreur:', error);
       }
+    },
+
+    applyFilters() {
+      this.pagination.current_page = 1;
+      this.fetchEmployees();
+    },
+
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchEmployees();
     },
 
     openCreateModal() {

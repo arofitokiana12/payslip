@@ -112,6 +112,15 @@
             </tbody>
           </table>
         </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} entreprise(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -333,6 +342,12 @@ export default {
       loading: false,
       search: '',
       filterActive: '',
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       isEditing: false,
       form: this.getEmptyForm(),
       modal: null,
@@ -392,8 +407,15 @@ export default {
     async fetchCompanies() {
       this.loading = true;
       try {
-        const response = await axios.get('/companies');
-        this.companies = response.data.data || response.data;
+        const params = new URLSearchParams();
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
+        const response = await axios.get(`/companies?${params.toString()}`);
+        this.companies = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des entreprises');
@@ -499,6 +521,10 @@ export default {
     formatDate(date) {
       if (!date) return '-';
       return new Date(date).toLocaleDateString('fr-FR');
+    },
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchCompanies();
     }
   }
 };

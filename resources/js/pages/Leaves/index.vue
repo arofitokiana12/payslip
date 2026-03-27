@@ -253,6 +253,15 @@
             </tbody>
           </table>
         </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} conge(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -439,6 +448,12 @@ export default {
         start_date: "",
         end_date: "",
       },
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1,
+      },
       stats: {
         pending: 0,
         approved: 0,
@@ -482,9 +497,15 @@ export default {
         if (this.filters.year) params.append("year", this.filters.year);
         if (this.filters.start_date) params.append("start_date", this.filters.start_date);
         if (this.filters.end_date) params.append("end_date", this.filters.end_date);
+        params.append("page", this.pagination.current_page);
+        params.append("per_page", this.pagination.per_page);
 
         const response = await axios.get(`/leaves?${params.toString()}`);
-        this.leaves = response.data.data || response.data;
+        this.leaves = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {}),
+        };
         this.calculateStats();
       } catch (error) {
         console.error("Erreur:", error);
@@ -496,7 +517,7 @@ export default {
 
     async fetchEmployees() {
       try {
-        const response = await axios.get("/employees");
+        const response = await axios.get("/employees?per_page=1000");
         this.employees = response.data.data || response.data;
       } catch (error) {
         console.error("Erreur:", error);
@@ -525,6 +546,7 @@ export default {
     },
 
     applyFilters() {
+      this.pagination.current_page = 1;
       this.fetchLeaves();
     },
 
@@ -537,11 +559,17 @@ export default {
         start_date: "",
         end_date: "",
       };
+      this.pagination.current_page = 1;
       this.fetchLeaves();
     },
 
     showPending() {
       this.filters.status = "pending";
+      this.pagination.current_page = 1;
+      this.fetchLeaves();
+    },
+    changePage(page) {
+      this.pagination.current_page = page;
       this.fetchLeaves();
     },
 
