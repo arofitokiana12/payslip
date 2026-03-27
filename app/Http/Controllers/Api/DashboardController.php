@@ -422,7 +422,7 @@ class DashboardController extends Controller
     /**
      * Alertes et notifications
      */
-    public function getAlerts()
+    public function alerts()
     {
         $alerts = [];
 
@@ -434,7 +434,7 @@ class DashboardController extends Controller
                 'icon' => 'fa-clock',
                 'title' => 'Demandes de congés en attente',
                 'message' => "$pendingLeaves demande(s) nécessitent votre approbation",
-                'action' => '/leaves?status=pending'
+                'action' => '/admin/leaves?status=pending'
             ];
         }
 
@@ -450,7 +450,7 @@ class DashboardController extends Controller
                 'icon' => 'fa-file-alt',
                 'title' => 'Fiches de paie en brouillon',
                 'message' => "$draftPayslips fiche(s) à finaliser pour ce mois",
-                'action' => '/payroll'
+                'action' => '/admin/payroll'
             ];
         }
 
@@ -468,7 +468,7 @@ class DashboardController extends Controller
                 'icon' => 'fa-exclamation-triangle',
                 'title' => 'Présences manquantes',
                 'message' => "$employeesWithoutAttendance employé(s) sans pointage cette semaine",
-                'action' => '/attendance'
+                'action' => '/admin/attendance'
             ];
         }
 

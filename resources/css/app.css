@@ -1,64 +1,6 @@
+/* Base app styles - le thème premium (premium-theme.css) gère le reste */
 body {
-    font-family: Arial, sans-serif;
-  }
-  
-
- 
-.login-page {
-  min-height: 100vh;
-  background: #1f2a37;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-
-.login-card {
-  width: 850px;
-  height: 450px;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.left-panel {
-  background: #2b5f7e;
-}
-
-.logo-box {
-  background: white;
-  padding: 20px 30px;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.logo {
-  width: 150px;
-}
-
-.right-panel {
-  background: #4fb3b8;
-  color: #2b2b2b;
-}
-
-.form-control {
-  height: 45px;
-  border-radius: 5px;
-}
-
-.btn-dark {
-  background-color: #1f3c50;
-  border: none;
-}
-
-.btn-dark:hover {
-  background-color: #162d3d;
-}
-
-.input-icon {
-  position: absolute;
-  top: 50%;
-  left: 15px;
-  transform: translateY(-50%);
-  color: #6c757d;
-}
-

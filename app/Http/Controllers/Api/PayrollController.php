@@ -50,10 +50,16 @@ class PayrollController extends Controller
 
         $payslips = $query->orderBy('period_year', 'desc')
             ->orderBy('period_month', 'desc')
-            ->get();
+            ->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $payslips
+            'data' => $payslips->items(),
+            'meta' => [
+                'current_page' => $payslips->currentPage(),
+                'per_page' => $payslips->perPage(),
+                'total' => $payslips->total(),
+                'last_page' => $payslips->lastPage(),
+            ],
         ]);
     }
 
@@ -259,10 +265,16 @@ class PayrollController extends Controller
                   ->whereMonth('date', $request->month);
         }
 
-        $bonuses = $query->orderBy('date', 'desc')->get();
+        $bonuses = $query->orderBy('date', 'desc')->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $bonuses
+            'data' => $bonuses->items(),
+            'meta' => [
+                'current_page' => $bonuses->currentPage(),
+                'per_page' => $bonuses->perPage(),
+                'total' => $bonuses->total(),
+                'last_page' => $bonuses->lastPage(),
+            ],
         ]);
     }
 
@@ -339,10 +351,16 @@ class PayrollController extends Controller
             $query->where('repayment_status', $request->status);
         }
 
-        $advances = $query->orderBy('date', 'desc')->get();
+        $advances = $query->orderBy('date', 'desc')->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $advances
+            'data' => $advances->items(),
+            'meta' => [
+                'current_page' => $advances->currentPage(),
+                'per_page' => $advances->perPage(),
+                'total' => $advances->total(),
+                'last_page' => $advances->lastPage(),
+            ],
         ]);
     }
 
@@ -420,10 +438,16 @@ class PayrollController extends Controller
                   ->whereMonth('date', $request->month);
         }
 
-        $overtimes = $query->orderBy('date', 'desc')->get();
+        $overtimes = $query->orderBy('date', 'desc')->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $overtimes
+            'data' => $overtimes->items(),
+            'meta' => [
+                'current_page' => $overtimes->currentPage(),
+                'per_page' => $overtimes->perPage(),
+                'total' => $overtimes->total(),
+                'last_page' => $overtimes->lastPage(),
+            ],
         ]);
     }
 

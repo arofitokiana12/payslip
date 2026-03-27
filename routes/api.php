@@ -21,13 +21,14 @@ Route::get('/test', function () {
 });
 
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
 //     return $request->user();
 // });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/auth/validate-token', [AuthController::class, 'validateToken']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::apiResource('positions', PositionController::class);
     /*

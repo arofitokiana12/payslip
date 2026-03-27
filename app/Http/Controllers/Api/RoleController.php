@@ -15,13 +15,19 @@ class RoleController extends Controller
     // INDEX — GET /api/roles
     // Retourne la liste de tous les rôles
     // ===================================================================
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $roles = Role::withCount('users')->get();
+        $roles = Role::withCount('users')->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
             'status' => 'success',
-            'data' => $roles,
+            'data' => $roles->items(),
+            'meta' => [
+                'current_page' => $roles->currentPage(),
+                'per_page' => $roles->perPage(),
+                'total' => $roles->total(),
+                'last_page' => $roles->lastPage(),
+            ],
         ]);
     }
 

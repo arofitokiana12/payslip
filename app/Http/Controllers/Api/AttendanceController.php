@@ -38,10 +38,18 @@ class AttendanceController extends Controller
             $query->where('status', $request->status);
         }
 
-        $attendances = $query->orderBy('date', 'desc')->get();
+        $attendances = $query
+            ->orderBy('date', 'desc')
+            ->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
-            'data' => $attendances
+            'data' => $attendances->items(),
+            'meta' => [
+                'current_page' => $attendances->currentPage(),
+                'per_page' => $attendances->perPage(),
+                'total' => $attendances->total(),
+                'last_page' => $attendances->lastPage(),
+            ],
         ]);
     }
 

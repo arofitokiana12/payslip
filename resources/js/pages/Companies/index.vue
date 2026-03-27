@@ -17,15 +17,15 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Rechercher une entreprise..."
+              :placeholder="$t('companies.search_placeholder')"
               v-model="search"
             />
           </div>
           <div class="col-md-3">
             <select class="form-select" v-model="filterActive">
-              <option value="">Tous les statuts</option>
-              <option value="true">Actives</option>
-              <option value="false">Inactives</option>
+              <option value="">{{ $t('companies.all_statuses') }}</option>
+              <option value="true">{{ $t('companies.active') }}</option>
+              <option value="false">{{ $t('companies.inactive') }}</option>
             </select>
           </div>
         </div>
@@ -42,22 +42,22 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th width="60">ID</th>
-                <th>Logo</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Adresse</th>
-                <th>NIF</th>
-                <th>STAT</th>
-                <th>Date Création</th>
-                <th>Statut</th>
-                <th width="200">Actions</th>
+                <th width="60">{{ $t('common.matricule') }}</th>
+                <th>{{ $t('companies.logo') }}</th>
+                <th>{{ $t('companies.name') }}</th>
+                <th>{{ $t('companies.email') }}</th>
+                <th>{{ $t('companies.adress') }}</th>
+                <th>{{ $t('companies.nif') }}</th>
+                <th>{{ $t('companies.stat') }}</th>
+                <th>{{ $t('companies.creation_date') }}</th>
+                <th>{{ $t('companies.status') }}</th>
+                <th width="200">{{ $t('companies.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="filteredCompanies.length === 0">
                 <td colspan="10" class="text-center text-muted">
-                  Aucune entreprise trouvée
+                  {{ $t('companies.no_found') }}
                 </td>
               </tr>
               <tr v-for="company in filteredCompanies" :key="company.company_id">
@@ -82,28 +82,28 @@
                 <td>{{ formatDate(company.date_creation) }}</td>
                 <td>
                   <span :class="company.active ? 'badge bg-success' : 'badge bg-danger'">
-                    {{ company.active ? 'Active' : 'Inactive' }}
+                    {{ company.active ? $t('companies.active') : $t('companies.inactive') }}
                   </span>
                 </td>
                 <td>
                   <button
                     class="btn btn-sm btn-info"
                     @click="viewCompany(company.company_id)"
-                    title="Voir détails"
+                    :title="$t('common.view_details')"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-warning ms-1"
                     @click="editCompany(company)"
-                    title="Modifier"
+                    :title="$t('common.edit')"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-danger ms-1"
                     @click="deleteCompany(company.company_id)"
-                    title="Supprimer"
+                    :title="$t('common.delete')"
                   >
                     <i class="fas fa-trash"></i>
                   </button>
@@ -111,6 +111,15 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} entreprise(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
         </div>
       </div>
     </div>
@@ -121,18 +130,18 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              {{ isEditing ? 'Modifier l\'Entreprise' : 'Nouvelle Entreprise' }}
+              {{ isEditing ? $t('companies.edit') : $t('companies.new') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form>
               <!-- Informations de base -->
-              <h6 class="border-bottom pb-2 mb-3">Informations Générales</h6>
+              <h6 class="border-bottom pb-2 mb-3">{{ $t('companies.general_info') }}</h6>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Nom de l'entreprise *</label>
+                  <label class="form-label">{{ $t('companies.company_name_required') }}</label>
                   <input
                     type="text"
                     class="form-control"
@@ -141,7 +150,7 @@
                   />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Email</label>
+                  <label class="form-label">{{ $t('companies.email') }}</label>
                   <input
                     type="email"
                     class="form-control"
@@ -152,7 +161,7 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Adresse</label>
+                  <label class="form-label">{{ $t('companies.adress') }}</label>
                   <input
                     type="text"
                     class="form-control"
@@ -160,7 +169,7 @@
                   />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date de Création</label>
+                  <label class="form-label">{{ $t('companies.creation_date') }}</label>
                   <input
                     type="date"
                     class="form-control"
@@ -170,11 +179,11 @@
               </div>
 
               <!-- Informations légales -->
-              <h6 class="border-bottom pb-2 mb-3 mt-4">Informations Légales</h6>
+              <h6 class="border-bottom pb-2 mb-3 mt-4">{{ $t('companies.legal_info') }}</h6>
 
               <div class="row">
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">NIF</label>
+                  <label class="form-label">{{ $t('companies.nif') }}</label>
                   <input
                     type="number"
                     class="form-control"
@@ -182,7 +191,7 @@
                   />
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">STAT</label>
+                  <label class="form-label">{{ $t('companies.stat') }}</label>
                   <input
                     type="number"
                     class="form-control"
@@ -190,7 +199,7 @@
                   />
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">RCS</label>
+                  <label class="form-label">{{ $t('companies.rcs') }}</label>
                   <input
                     type="number"
                     class="form-control"
@@ -200,31 +209,31 @@
               </div>
 
               <!-- Logo et statut -->
-              <h6 class="border-bottom pb-2 mb-3 mt-4">Autres</h6>
+              <h6 class="border-bottom pb-2 mb-3 mt-4">{{ $t('companies.other') }}</h6>
 
               <div class="row">
                 <div class="col-md-8 mb-3">
-                  <label class="form-label">Logo (URL)</label>
+                  <label class="form-label">{{ $t('companies.logo_url') }}</label>
                   <input
                     type="text"
                     class="form-control"
                     v-model="form.logo"
-                    placeholder="https://example.com/logo.png"
+                    :placeholder="$t('companies.logo_url_placeholder')"
                   />
-                  <small class="text-muted">URL de l'image du logo</small>
+                  <small class="text-muted">{{ $t('companies.logo_url_hint') }}</small>
                 </div>
                 <div class="col-md-4 mb-3">
-                  <label class="form-label">Statut</label>
+                  <label class="form-label">{{ $t('companies.status') }}</label>
                   <select class="form-select" v-model="form.active">
-                    <option :value="true">Active</option>
-                    <option :value="false">Inactive</option>
+                    <option :value="true">{{ $t('companies.active') }}</option>
+                    <option :value="false">{{ $t('companies.inactive') }}</option>
                   </select>
                 </div>
               </div>
 
               <!-- Aperçu du logo -->
               <div v-if="form.logo" class="mb-3">
-                <label class="form-label">Aperçu du logo</label>
+                <label class="form-label">{{ $t('companies.logo_preview') }}</label>
                 <div>
                   <img
                     :src="form.logo"
@@ -234,7 +243,7 @@
                     @error="logoError = true"
                   />
                   <p v-if="logoError" class="text-danger small mt-1">
-                    Impossible de charger l'image
+                    {{ $t('companies.load_image_error') }}
                   </p>
                 </div>
               </div>
@@ -242,10 +251,10 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              <i class="fas fa-times"></i> Annuler
+              <i class="fas fa-times"></i> {{ $t('common.cancel') }}
             </button>
             <button type="button" class="btn btn-primary" @click="saveCompany">
-              <i class="fas fa-save"></i> Enregistrer
+              <i class="fas fa-save"></i> {{ $t('common.save') }}
             </button>
           </div>
         </div>
@@ -257,7 +266,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Détails de l'Entreprise</h5>
+            <h5 class="modal-title">{{ $t('companies.details') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body" v-if="selectedCompany">
@@ -272,45 +281,47 @@
                 />
                 <h5>{{ selectedCompany.company_name }}</h5>
                 <span :class="selectedCompany.active ? 'badge bg-success' : 'badge bg-danger'">
-                  {{ selectedCompany.active ? 'Active' : 'Inactive' }}
+                  {{ selectedCompany.active ? $t('companies.active') : $t('companies.inactive') }}
                 </span>
               </div>
               <div class="col-md-9">
                 <table class="table table-bordered">
-                  <tr>
-                    <th width="180">ID</th>
-                    <td>{{ selectedCompany.company_id }}</td>
-                  </tr>
-                  <tr>
-                    <th>Email</th>
-                    <td>{{ selectedCompany.email || '-' }}</td>
-                  </tr>
-                  <tr>
-                    <th>Adresse</th>
-                    <td>{{ selectedCompany.adress || '-' }}</td>
-                  </tr>
-                  <tr>
-                    <th>Date de Création</th>
-                    <td>{{ formatDate(selectedCompany.date_creation) }}</td>
-                  </tr>
-                  <tr>
-                    <th>NIF</th>
-                    <td>{{ selectedCompany.nif || '-' }}</td>
-                  </tr>
-                  <tr>
-                    <th>STAT</th>
-                    <td>{{ selectedCompany.stat || '-' }}</td>
-                  </tr>
-                  <tr>
-                    <th>RCS</th>
-                    <td>{{ selectedCompany.rcs || '-' }}</td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <th width="180">{{ $t('common.matricule') }}</th>
+                      <td>{{ selectedCompany.company_id }}</td>
+                    </tr>
+                    <tr>
+                      <th>Email</th>
+                      <td>{{ selectedCompany.email || '-' }}</td>
+                    </tr>
+                    <tr>
+                      <th>Adresse</th>
+                      <td>{{ selectedCompany.adress || '-' }}</td>
+                    </tr>
+                    <tr>
+                      <th>Date de Création</th>
+                      <td>{{ formatDate(selectedCompany.date_creation) }}</td>
+                    </tr>
+                    <tr>
+                      <th>NIF</th>
+                      <td>{{ selectedCompany.nif || '-' }}</td>
+                    </tr>
+                    <tr>
+                      <th>STAT</th>
+                      <td>{{ selectedCompany.stat || '-' }}</td>
+                    </tr>
+                    <tr>
+                      <th>RCS</th>
+                      <td>{{ selectedCompany.rcs || '-' }}</td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>
@@ -331,6 +342,12 @@ export default {
       loading: false,
       search: '',
       filterActive: '',
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       isEditing: false,
       form: this.getEmptyForm(),
       modal: null,
@@ -390,8 +407,15 @@ export default {
     async fetchCompanies() {
       this.loading = true;
       try {
-        const response = await axios.get('/companies');
-        this.companies = response.data.data || response.data;
+        const params = new URLSearchParams();
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
+        const response = await axios.get(`/companies?${params.toString()}`);
+        this.companies = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des entreprises');
@@ -497,6 +521,10 @@ export default {
     formatDate(date) {
       if (!date) return '-';
       return new Date(date).toLocaleDateString('fr-FR');
+    },
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchCompanies();
     }
   }
 };

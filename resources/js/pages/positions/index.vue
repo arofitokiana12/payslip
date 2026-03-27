@@ -2,10 +2,10 @@
   <div class="container-fluid mt-4">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Positions</h3>
+        <h3 class="card-title">{{ $t('positions.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-primary btn-sm" @click="openCreateModal">
-            <i class="fas fa-plus"></i> New position
+            <i class="fas fa-plus"></i> {{ $t('positions.new') }}
           </button>
         </div>
       </div>
@@ -14,7 +14,7 @@
         <!-- Loader -->
         <div v-if="loading" class="text-center">
           <div class="spinner-border" role="status">
-            <span class="visually-hidden">Chargement...</span>
+            <span class="visually-hidden">{{ $t('common.loading') }}</span>
           </div>
         </div>
 
@@ -22,29 +22,41 @@
         <table v-else class="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Position name</th>
-              <th>Actions</th>
+              <th>{{ $t('common.matricule') }}</th>
+              <th>{{ $t('positions.position_name') }}</th>
+              <th>{{ $t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody>
+            <tr v-if="positions.length === 0">
+              <td colspan="3" class="text-center text-muted">Aucune position</td>
+            </tr>
             <tr v-for="position in positions" :key="position.position_id">
               <td>{{ position.position_id }}</td>
               <td>{{ position.position_name }}</td>
               <td>
                 <button class="btn btn-sm btn-info" @click="editPosition(position)">
-                  <i class="fas fa-edit"></i> Modifier
+                  <i class="fas fa-edit"></i> {{ $t('common.edit') }}
                 </button>
                 <button
                   class="btn btn-sm btn-danger ms-1"
                   @click="deletePosition(position.position_id)"
                 >
-                  <i class="fas fa-trash"></i> Supprimer
+                  <i class="fas fa-trash"></i> {{ $t('common.delete') }}
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} position(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -53,13 +65,13 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEditing ? "Modifier" : "Créer" }} Poste</h5>
+            <h5 class="modal-title">{{ isEditing ? $t('positions.edit') : $t('positions.create') }} {{ $t('nav.positions') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="savePosition">
               <div class="mb-3">
-                <label class="form-label">Nom du Poste</label>
+                <label class="form-label">{{ $t('positions.position_name') }}</label>
                 <input
                   type="text"
                   class="form-control"
@@ -75,10 +87,10 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Annuler
+              {{ $t('common.cancel') }}
             </button>
             <button type="button" class="btn btn-primary" @click="savePosition">
-              Enregistrer
+              {{ $t('common.save') }}
             </button>
           </div>
         </div>
@@ -97,6 +109,12 @@ export default {
     return {
       positions: [],
       loading: false,
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       isEditing: false,
       form: {
         position_id: null,
@@ -117,8 +135,15 @@ export default {
     async fetchPositions() {
       this.loading = true;
       try {
-        const response = await axios.get("/positions");
-        this.positions = response.data.data || response.data;
+        const params = new URLSearchParams();
+        params.append("page", this.pagination.current_page);
+        params.append("per_page", this.pagination.per_page);
+        const response = await axios.get(`/positions?${params.toString()}`);
+        this.positions = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error("Erreur lors du chargement des postes:", error);
         alert("Erreur lors du chargement des postes");
@@ -185,6 +210,10 @@ export default {
         console.error("Erreur:", error);
         alert("Erreur lors de la suppression");
       }
+    },
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchPositions();
     },
   },
 };

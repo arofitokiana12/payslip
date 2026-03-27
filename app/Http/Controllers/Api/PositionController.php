@@ -21,11 +21,17 @@ class PositionController extends Controller
             $query->where('company_id', $request->company_id);
         }
 
-        $positions = $query->get();
+        $positions = $query->paginate((int) $request->get('per_page', 15));
 
         return response()->json([
             'status' => 'success',
-            'data'   => $positions,
+            'data'   => $positions->items(),
+            'meta'   => [
+                'current_page' => $positions->currentPage(),
+                'per_page' => $positions->perPage(),
+                'total' => $positions->total(),
+                'last_page' => $positions->lastPage(),
+            ],
         ]);
     } 
 

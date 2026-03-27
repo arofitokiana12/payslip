@@ -5,7 +5,7 @@
         <h3 class="card-title">{{ $t('employees.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-primary btn-sm" @click="openCreateModal">
-            <i class="fas fa-plus"></i> Nouvel Employé
+            <i class="fas fa-plus"></i> {{ $t('employees.new') }}
           </button>
         </div>
       </div>
@@ -17,8 +17,9 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Rechercher un employé..."
+              :placeholder="$t('employees.search_placeholder')"
               v-model="search"
+              @input="applyFilters"
             />
           </div>
         </div>
@@ -33,7 +34,7 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th>{{ $t('employees.id')}}</th>
+                <th>{{ $t('common.matricule') }}</th>
                 <th>{{ $t('employees.last_name')}}</th>
                 <th>{{ $t('employees.first_name')}}</th>
                 <th>{{ $t('employees.position')}}</th>
@@ -45,7 +46,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="employee in filteredEmployees" :key="employee.employee_id">
+              <tr v-if="employees.length === 0">
+                <td colspan="9" class="text-center text-muted">{{ $t('employees.no_found') }}</td>
+              </tr>
+              <tr v-for="employee in employees" :key="employee.employee_id">
                 <td>{{ employee.matricule }}</td>
                 <td>{{ employee.last_name }}</td>
                 <td>{{ employee.first_name }}</td>
@@ -70,6 +74,15 @@
             </tbody>
           </table>
         </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} employe(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -78,29 +91,29 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ isEditing ? 'Modifier' : 'Créer' }} Employé</h5>
+            <h5 class="modal-title">{{ isEditing ? $t('employees.edit') : $t('employees.new') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Prénom *</label>
+                  <label class="form-label">{{ $t('employees.first_name') }} *</label>
                   <input type="text" class="form-control" v-model="form.first_name" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Nom *</label>
+                  <label class="form-label">{{ $t('employees.last_name') }} *</label>
                   <input type="text" class="form-control" v-model="form.last_name" required />
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Matricule *</label>
+                  <label class="form-label">{{ $t('common.matricule') }} *</label>
                   <input type="text" class="form-control" v-model="form.matricule" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Poste *</label>
+                  <label class="form-label">{{ $t('employees.position') }} *</label>
                   <select class="form-select" v-model="form.position_id" required>
                     <option value="">-- Sélectionner --</option>
                     <option v-for="pos in positions" :key="pos.position_id" :value="pos.position_id">
@@ -112,11 +125,11 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date d'embauche *</label>
+                  <label class="form-label">{{ $t('employees.hire_date') }} *</label>
                   <input type="date" class="form-control" v-model="form.hire_date" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Type de Contrat *</label>
+                  <label class="form-label">{{ $t('employees.contract_type') }} *</label>
                   <select class="form-select" v-model="form.contract_type" required>
                     <option value="CDI">CDI</option>
                     <option value="CDD">CDD</option>
@@ -128,18 +141,18 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Date fin contrat </label>
+                  <label class="form-label">{{ $t('employees.contract_end_date') }}</label>
                   <input type="date" class="form-control" v-model="form.contract_end_date" />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Salaire de Base *</label>
+                  <label class="form-label">{{ $t('employees.base_salary') }} *</label>
                   <input type="number" step="0.01" class="form-control" v-model="form.base_salary" required />
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Statut</label>
+                  <label class="form-label">{{ $t('employees.status') }}</label>
                   <select class="form-select" v-model="form.status">
                     <option value="active">Actif</option>
                     <option value="inactive">Inactif</option>
@@ -148,7 +161,7 @@
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Actif</label>
+                  <label class="form-label">{{ $t('employees.active') }}</label>
                   <select class="form-select" v-model="form.active">
                     <option :value="true">Oui</option>
                     <option :value="false">Non</option>
@@ -158,8 +171,8 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" @click="saveEmployee">Enregistrer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.cancel') }}</button>
+            <button type="button" class="btn btn-primary" @click="saveEmployee">{{ $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -179,22 +192,16 @@ export default {
       positions: [],
       loading: false,
       search: '',
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       isEditing: false,
       form: this.getEmptyForm(),
       modal: null
     };
-  },
-
-  computed: {
-    filteredEmployees() {
-      if (!this.search) return this.employees;
-      const searchLower = this.search.toLowerCase();
-      return this.employees.filter(emp =>
-        emp.first_name.toLowerCase().includes(searchLower) ||
-        emp.last_name.toLowerCase().includes(searchLower) ||
-        emp.matricule.toString().includes(searchLower)
-      );
-    }
   },
 
   mounted() {
@@ -224,8 +231,17 @@ export default {
     async fetchEmployees() {
       this.loading = true;
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/employees');
-        this.employees = response.data.data || response.data;
+        const params = new URLSearchParams();
+        if (this.search) params.append('search', this.search);
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
+
+        const response = await axios.get(`/employees?${params.toString()}`);
+        this.employees = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des employés');
@@ -236,11 +252,21 @@ export default {
 
     async fetchPositions() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/positions');
+        const response = await axios.get('/positions?per_page=1000');
         this.positions = response.data.data || response.data;
       } catch (error) {
         console.error('Erreur:', error);
       }
+    },
+
+    applyFilters() {
+      this.pagination.current_page = 1;
+      this.fetchEmployees();
+    },
+
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchEmployees();
     },
 
     openCreateModal() {

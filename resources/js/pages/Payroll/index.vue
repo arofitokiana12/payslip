@@ -4,31 +4,19 @@
     <!-- Header avec période sélection -->
     <div class="card mb-4">
       <div class="card-header">
-        <h3 class="card-title">💰 Gestion de la Paie</h3>
+        <h3 class="card-title">💰 {{ $t('payroll.title') }}</h3>
         <div class="card-tools">
           <div class="d-flex gap-3 align-items-center">
-            <!-- Sélecteur de période -->
-            <select class="form-select" v-model="selectedMonth" @change="fetchPayslips">
-              <option value="1">Janvier</option>
-              <option value="2">Février</option>
-              <option value="3">Mars</option>
-              <option value="4">Avril</option>
-              <option value="5">Mai</option>
-              <option value="6">Juin</option>
-              <option value="7">Juillet</option>
-              <option value="8">Août</option>
-              <option value="9">Septembre</option>
-              <option value="10">Octobre</option>
-              <option value="11">Novembre</option>
-              <option value="12">Décembre</option>
+            <select class="form-select" v-model="selectedMonth" @change="onPeriodChange">
+              <option v-for="m in 12" :key="m" :value="m">{{ $t('payroll.month_' + m) }}</option>
             </select>
-            <select class="form-select" v-model="selectedYear" @change="fetchPayslips">
+            <select class="form-select" v-model="selectedYear" @change="onPeriodChange">
               <option value="2024">2024</option>
               <option value="2025">2025</option>
               <option value="2026">2026</option>
             </select>
             <button class="btn btn-primary" @click="showGenerateModal">
-              <i class="fas fa-magic"></i> Générer
+              <i class="fas fa-magic"></i> {{ $t('payroll.generate') }}
             </button>
           </div>
         </div>
@@ -41,7 +29,7 @@
         <div class="stat-header">
           <div class="stat-content">
             <h3>{{ payslips.filter((p) => p.status === "draft").length }}</h3>
-            <p>Brouillons</p>
+            <p>{{ $t('payroll.drafts') }}</p>
           </div>
           <div class="stat-icon">
             <i class="fas fa-file-alt"></i>
@@ -53,7 +41,7 @@
         <div class="stat-header">
           <div class="stat-content">
             <h3>{{ payslips.filter((p) => p.status === "finalized").length }}</h3>
-            <p>Finalisées</p>
+            <p>{{ $t('payroll.finalized') }}</p>
           </div>
           <div class="stat-icon">
             <i class="fas fa-check-circle"></i>
@@ -65,7 +53,7 @@
         <div class="stat-header">
           <div class="stat-content">
             <h3>{{ formatCurrency(totalGross) }}</h3>
-            <p>Total Brut</p>
+            <p>{{ $t('payroll.total_gross') }}</p>
           </div>
           <div class="stat-icon">
             <i class="fas fa-coins"></i>
@@ -77,7 +65,7 @@
         <div class="stat-header">
           <div class="stat-content">
             <h3>{{ formatCurrency(totalNet) }}</h3>
-            <p>Total Net</p>
+            <p>{{ $t('payroll.total_net') }}</p>
           </div>
           <div class="stat-icon">
             <i class="fas fa-wallet"></i>
@@ -89,14 +77,14 @@
     <!-- Liste des fiches -->
     <div class="card">
       <div class="card-header">
-        <h4 class="card-title">Fiches de Paie</h4>
+        <h4 class="card-title">{{ $t('payroll.payslips') }}</h4>
       </div>
       <div class="card-body">
         <!-- Filtres -->
         <div class="row mb-4">
           <div class="col-md-3">
             <select class="form-select" v-model="filterEmployee" @change="applyFilters">
-              <option value="">Tous les employés</option>
+              <option value="">{{ $t('payroll.all_employees') }}</option>
               <option
                 v-for="emp in employees"
                 :key="emp.employee_id"
@@ -108,10 +96,10 @@
           </div>
           <div class="col-md-3">
             <select class="form-select" v-model="filterStatus" @change="applyFilters">
-              <option value="">Tous les statuts</option>
-              <option value="draft">Brouillon</option>
-              <option value="finalized">Finalisé</option>
-              <option value="paid">Payé</option>
+              <option value="">{{ $t('payroll.all_statuses') }}</option>
+              <option value="draft">{{ $t('payroll.status_draft') }}</option>
+              <option value="finalized">{{ $t('payroll.status_finalized') }}</option>
+              <option value="paid">{{ $t('payroll.status_paid') }}</option>
             </select>
           </div>
         </div>
@@ -126,20 +114,20 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Employé</th>
-                <th>Période</th>
-                <th>Salaire Brut</th>
-                <th>Déductions</th>
-                <th>Salaire Net</th>
-                <th>Statut</th>
-                <th>Actions</th>
+                <th>{{ $t('attendance.employee') }}</th>
+                <th>{{ $t('payroll.period') }}</th>
+                <th>{{ $t('payroll.gross_salary') }}</th>
+                <th>{{ $t('payroll.deductions') }}</th>
+                <th>{{ $t('payroll.net_salary') }}</th>
+                <th>{{ $t('common.status') }}</th>
+                <th>{{ $t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="filteredPayslips.length === 0">
                 <td colspan="7" class="text-center text-muted py-5">
                   <i class="fas fa-inbox fa-3x mb-3 d-block" style="opacity: 0.3"></i>
-                  Aucune fiche de paie trouvée
+                  {{ $t('payroll.no_found') }}
                 </td>
               </tr>
               <tr
@@ -185,7 +173,7 @@
                     <button
                       class="btn btn-info btn-sm"
                       @click="viewPayslip(payslip.payslip_id)"
-                      title="Voir détails"
+                      :title="$t('payroll.view_details')"
                     >
                       <i class="fas fa-eye"></i>
                     </button>
@@ -194,7 +182,7 @@
                       v-if="payslip.status === 'draft'"
                       class="btn btn-success btn-sm"
                       @click="finalizePayslip(payslip.payslip_id)"
-                      title="Finaliser"
+                      :title="$t('payroll.finalize')"
                     >
                       <i class="fas fa-check"></i>
                     </button>
@@ -203,7 +191,7 @@
                       v-if="payslip.status === 'finalized'"
                       class="btn btn-warning btn-sm"
                       @click="markAsPaid(payslip.payslip_id)"
-                      title="Marquer payé"
+                      :title="$t('payroll.mark_paid')"
                     >
                       <i class="fas fa-money-bill-wave"></i>
                     </button>
@@ -211,7 +199,7 @@
                     <button
                       class="btn btn-primary btn-sm"
                       @click="downloadPayslip(payslip.payslip_id)"
-                      title="Télécharger PDF"
+                      :title="$t('payroll.download_pdf')"
                     >
                       <i class="fas fa-download"></i>
                     </button>
@@ -220,7 +208,7 @@
                       v-if="payslip.status === 'draft'"
                       class="btn btn-danger btn-sm"
                       @click="deletePayslip(payslip.payslip_id)"
-                      title="Supprimer"
+                      :title="$t('common.delete')"
                     >
                       <i class="fas fa-trash"></i>
                     </button>
@@ -230,6 +218,15 @@
             </tbody>
           </table>
         </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} fiche(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page <= 1 || loading" @click="changePage(pagination.current_page - 1)">Precedent</button>
+            <button class="btn btn-outline-secondary btn-sm" :disabled="pagination.current_page >= pagination.last_page || loading" @click="changePage(pagination.current_page + 1)">Suivant</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -238,32 +235,21 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Générer les Fiches de Paie</h5>
+            <h5 class="modal-title">{{ $t('payroll.generate_title') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <div class="mb-4">
-              <h6>Période</h6>
+              <h6>{{ $t('payroll.period') }}</h6>
               <div class="row">
                 <div class="col-md-6">
-                  <label class="form-label">Mois</label>
+                  <label class="form-label">{{ $t('payroll.month') }}</label>
                   <select class="form-select" v-model="generateForm.month">
-                    <option value="1">Janvier</option>
-                    <option value="2">Février</option>
-                    <option value="3">Mars</option>
-                    <option value="4">Avril</option>
-                    <option value="5">Mai</option>
-                    <option value="6">Juin</option>
-                    <option value="7">Juillet</option>
-                    <option value="8">Août</option>
-                    <option value="9">Septembre</option>
-                    <option value="10">Octobre</option>
-                    <option value="11">Novembre</option>
-                    <option value="12">Décembre</option>
+                    <option v-for="m in 12" :key="m" :value="m">{{ $t('payroll.month_' + m) }}</option>
                   </select>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Année</label>
+                  <label class="form-label">{{ $t('payroll.year') }}</label>
                   <select class="form-select" v-model="generateForm.year">
                     <option value="2024">2024</option>
                     <option value="2025">2025</option>
@@ -274,7 +260,7 @@
             </div>
 
             <div class="mb-4">
-              <h6>Employés</h6>
+              <h6>{{ $t('payroll.employees_section') }}</h6>
               <div class="form-check mb-3">
                 <input
                   class="form-check-input"
@@ -284,7 +270,7 @@
                   id="modeAll"
                 />
                 <label class="form-check-label" for="modeAll">
-                  Tous les employés actifs
+                  {{ $t('payroll.all_active') }}
                 </label>
               </div>
               <div class="form-check mb-3">
@@ -295,12 +281,12 @@
                   value="single"
                   id="modeSingle"
                 />
-                <label class="form-check-label" for="modeSingle"> Un seul employé </label>
+                <label class="form-check-label" for="modeSingle"> {{ $t('payroll.single_employee') }} </label>
               </div>
 
               <div v-if="generateMode === 'single'" class="mt-3">
                 <select class="form-select" v-model="generateForm.employee_id">
-                  <option value="">-- Sélectionner un employé --</option>
+                  <option value="">-- {{ $t('payroll.select_employee') }} --</option>
                   <option
                     v-for="emp in employees"
                     :key="emp.employee_id"
@@ -316,61 +302,63 @@
               v-if="generateMode === 'single' && generateForm.employee_id"
               class="alert alert-info"
             >
-              <h6>Prévisualisation</h6>
+              <h6>{{ $t('payroll.preview') }}</h6>
               <button class="btn btn-sm btn-primary" @click="previewCalculation">
-                <i class="fas fa-calculator"></i> Calculer
+                <i class="fas fa-calculator"></i> {{ $t('payroll.calculate') }}
               </button>
 
               <div v-if="calculationPreview" class="mt-3">
                 <table class="table table-sm">
-                  <tr>
-                    <td><strong>Salaire de base:</strong></td>
-                    <td class="text-end">
-                      {{ formatCurrency(calculationPreview.earnings.base_salary) }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Heures supplémentaires:</strong></td>
-                    <td class="text-end">
-                      {{ formatCurrency(calculationPreview.earnings.overtime) }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Bonus:</strong></td>
-                    <td class="text-end">
-                      {{ formatCurrency(calculationPreview.earnings.bonuses) }}
-                    </td>
-                  </tr>
-                  <tr class="table-primary">
-                    <td><strong>Total Brut:</strong></td>
-                    <td class="text-end">
-                      <strong>{{
-                        formatCurrency(calculationPreview.gross_salary)
-                      }}</strong>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Déductions:</strong></td>
-                    <td class="text-end text-danger">
-                      -{{ formatCurrency(calculationPreview.deductions.total) }}
-                    </td>
-                  </tr>
-                  <tr class="table-success">
-                    <td><strong>Salaire Net:</strong></td>
-                    <td class="text-end">
-                      <strong>{{ formatCurrency(calculationPreview.net_salary) }}</strong>
-                    </td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <td><strong>Salaire de base:</strong></td>
+                      <td class="text-end">
+                        {{ formatCurrency(calculationPreview.earnings.base_salary) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Heures supplémentaires:</strong></td>
+                      <td class="text-end">
+                        {{ formatCurrency(calculationPreview.earnings.overtime) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bonus:</strong></td>
+                      <td class="text-end">
+                        {{ formatCurrency(calculationPreview.earnings.bonuses) }}
+                      </td>
+                    </tr>
+                    <tr class="table-primary">
+                      <td><strong>Total Brut:</strong></td>
+                      <td class="text-end">
+                        <strong>{{
+                          formatCurrency(calculationPreview.gross_salary)
+                        }}</strong>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>{{ $t('payroll.deductions') }}:</strong></td>
+                      <td class="text-end text-danger">
+                        -{{ formatCurrency(calculationPreview.deductions.total) }}
+                      </td>
+                    </tr>
+                    <tr class="table-success">
+                      <td><strong>{{ $t('payroll.net_salary_label') }}</strong></td>
+                      <td class="text-end">
+                        <strong>{{ formatCurrency(calculationPreview.net_salary) }}</strong>
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Annuler
+              {{ $t('common.cancel') }}
             </button>
             <button type="button" class="btn btn-primary" @click="generatePayslips">
-              <i class="fas fa-magic"></i> Générer
+              <i class="fas fa-magic"></i> {{ $t('payroll.generate') }}
             </button>
           </div>
         </div>
@@ -382,7 +370,7 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Détails de la Fiche de Paie</h5>
+            <h5 class="modal-title">{{ $t('payroll.details_title') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body" v-if="selectedPayslip">
@@ -417,7 +405,7 @@
               <div class="col-md-6">
                 <div class="card">
                   <div class="card-header bg-success text-white">
-                    <h6 class="mb-0">💰 Gains</h6>
+                    <h6 class="mb-0">💰 {{ $t('payroll.gains') }}</h6>
                   </div>
                   <div class="card-body">
                     <table class="table table-sm">
@@ -432,7 +420,7 @@
                           <td class="text-end">{{ formatCurrency(item.amount) }}</td>
                         </tr>
                         <tr class="table-success">
-                          <td><strong>Total Gains</strong></td>
+                          <td><strong>{{ $t('payroll.total_gains') }}</strong></td>
                           <td class="text-end">
                             <strong>{{
                               formatCurrency(selectedPayslip.total_earnings)
@@ -449,7 +437,7 @@
               <div class="col-md-6">
                 <div class="card">
                   <div class="card-header bg-danger text-white">
-                    <h6 class="mb-0">📉 Déductions & Impôts</h6>
+                    <h6 class="mb-0">📉 {{ $t('payroll.deductions_taxes') }}</h6>
                   </div>
                   <div class="card-body">
                     <table class="table table-sm">
@@ -466,7 +454,7 @@
                           </td>
                         </tr>
                         <tr class="table-danger">
-                          <td><strong>Total Déductions</strong></td>
+                          <td><strong>{{ $t('payroll.total_deductions_label') }}</strong></td>
                           <td class="text-end">
                             <strong
                               >-{{
@@ -487,7 +475,7 @@
               <div class="card-body">
                 <div class="row align-items-center">
                   <div class="col-md-6">
-                    <h4 class="mb-0">Salaire Net à Payer</h4>
+                    <h4 class="mb-0">{{ $t('payroll.net_to_pay') }}</h4>
                   </div>
                   <div class="col-md-6 text-end">
                     <h2 class="mb-0">{{ formatCurrency(selectedPayslip.net_salary) }}</h2>
@@ -498,14 +486,14 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Fermer
+              {{ $t('common.close') }}
             </button>
             <button
               type="button"
               class="btn btn-primary"
               @click="downloadPayslip(selectedPayslip.payslip_id)"
             >
-              <i class="fas fa-download"></i> Télécharger PDF
+              <i class="fas fa-download"></i> {{ $t('payroll.download_pdf') }}
             </button>
           </div>
         </div>
@@ -529,6 +517,12 @@ export default {
       selectedYear: new Date().getFullYear(),
       filterEmployee: "",
       filterStatus: "",
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1,
+      },
 
       generateMode: "all",
       generateForm: {
@@ -547,11 +541,7 @@ export default {
 
   computed: {
     filteredPayslips() {
-      return this.payslips.filter((p) => {
-        if (this.filterEmployee && p.employee_id != this.filterEmployee) return false;
-        if (this.filterStatus && p.status !== this.filterStatus) return false;
-        return true;
-      });
+      return this.payslips;
     },
 
     totalGross() {
@@ -571,6 +561,11 @@ export default {
   },
 
   methods: {
+    onPeriodChange() {
+      this.pagination.current_page = 1;
+      this.fetchPayslips();
+    },
+
     async fetchPayslips() {
       this.loading = true;
       try {
@@ -578,8 +573,16 @@ export default {
           month: this.selectedMonth,
           year: this.selectedYear,
         });
+        if (this.filterEmployee) params.append("employee_id", this.filterEmployee);
+        if (this.filterStatus) params.append("status", this.filterStatus);
+        params.append("page", this.pagination.current_page);
+        params.append("per_page", this.pagination.per_page);
         const response = await axios.get(`/payroll/payslips?${params.toString()}`);
-        this.payslips = response.data.data || response.data;
+        this.payslips = response.data.data || [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {}),
+        };
       } catch (error) {
         console.error("Erreur:", error);
         alert("Erreur lors du chargement");
@@ -590,7 +593,7 @@ export default {
 
     async fetchEmployees() {
       try {
-        const response = await axios.get("/employees");
+        const response = await axios.get("/employees?per_page=1000");
         this.employees = response.data.data || response.data;
       } catch (error) {
         console.error("Erreur:", error);
@@ -598,7 +601,13 @@ export default {
     },
 
     applyFilters() {
-      // Les filtres sont appliqués via computed property
+      this.pagination.current_page = 1;
+      this.fetchPayslips();
+    },
+
+    changePage(page) {
+      this.pagination.current_page = page;
+      this.fetchPayslips();
     },
 
     showGenerateModal() {
@@ -710,9 +719,10 @@ export default {
     async downloadMonthlyZip() {
       if (
         !confirm(
-          `Télécharger toutes les fiches de ${this.getMonthName(this.selectedMonth)} ${
-            this.selectedYear
-          } en ZIP ?`
+          this.$t("payroll.download_all_confirm", {
+            month: this.getMonthName(this.selectedMonth),
+            year: this.selectedYear,
+          })
         )
       ) {
         return;
@@ -742,10 +752,10 @@ export default {
         link.click();
         link.remove();
 
-        alert("Archive ZIP téléchargée avec succès");
+        alert(this.$t("payroll.zip_download_success"));
       } catch (error) {
         console.error("Erreur:", error);
-        alert("Erreur lors du téléchargement");
+        alert(this.$t("payroll.zip_download_error"));
       }
     },
 
@@ -754,22 +764,7 @@ export default {
     },
 
     getMonthName(month) {
-      const months = [
-        "",
-        "Jan",
-        "Fév",
-        "Mar",
-        "Avr",
-        "Mai",
-        "Juin",
-        "Juil",
-        "Aoû",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Déc",
-      ];
-      return months[month];
+      return this.$t("payroll.month_" + month) || month;
     },
 
     getStatusClass(status) {
@@ -782,12 +777,7 @@ export default {
     },
 
     getStatusLabel(status) {
-      const labels = {
-        draft: "Brouillon",
-        finalized: "Finalisé",
-        paid: "Payé",
-      };
-      return labels[status] || status;
+      return this.$t("payroll.status_" + status) || status;
     },
   },
 };

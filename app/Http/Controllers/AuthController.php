@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -30,13 +33,16 @@ class AuthController extends Controller
 
 
 
-        //  Créer le token
-        $token =$user->createToken('auth-token')->plainTextToken;
+        // Créer le token avec expiration (si configurée)
+        $expirationMinutes = config('sanctum.expiration');
+        $expiresAt = $expirationMinutes ? Carbon::now()->addMinutes((int) $expirationMinutes) : null;
+        $token = $user->createToken('auth-token', ['*'], $expiresAt)->plainTextToken;
 
         return response()->json([
             'success' => true,
             'token' => $token,
             'user' => $user,
+            'expires_at' => $expiresAt?->toIso8601String(),
             'message' => 'Login successful',
 
         ]);
@@ -51,6 +57,27 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logout réussi'
+        ]);
+    }
+
+    public function validateToken(Request $request): JsonResponse
+    {
+        $plainTextToken = $request->bearerToken();
+        $matchedToken = $plainTextToken ? PersonalAccessToken::findToken($plainTextToken) : null;
+
+        // Vérification stricte du Bearer token (pas la session/cookie).
+        if (!$plainTextToken || !$matchedToken) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if ($matchedToken->expires_at && $matchedToken->expires_at->isPast()) {
+            return response()->json(['message' => 'Token expired.'], 401);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'user' => $request->user(),
+            'expires_at' => $matchedToken?->expires_at,
         ]);
     }
 

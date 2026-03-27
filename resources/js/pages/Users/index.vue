@@ -2,10 +2,10 @@
   <div class="container-fluid mt-4">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Gestion des Utilisateurs</h3>
+        <h3 class="card-title">{{ $t('users.title') }}</h3>
         <div class="card-tools">
           <button class="btn btn-sm btn-primary" @click="openCreateModal">
-            <i class="fas fa-plus"></i> Nouvel Utilisateur
+            <i class="fas fa-plus"></i> {{ $t('users.new') }}
           </button>
         </div>
       </div>
@@ -17,14 +17,14 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Rechercher..."
+              :placeholder="$t('users.search_placeholder')"
               v-model="filters.search"
               @input="applyFilters"
             />
           </div>
           <div class="col-md-3">
             <select class="form-select" v-model="filters.role_id" @change="applyFilters">
-              <option value="">Tous les rôles</option>
+              <option value="">{{ $t('common.all_roles') }}</option>
               <option v-for="role in roles" :key="role.role_id" :value="role.role_id">
                 {{ role.name }}
               </option>
@@ -32,14 +32,14 @@
           </div>
           <div class="col-md-3">
             <select class="form-select" v-model="filters.active" @change="applyFilters">
-              <option value="">Tous les statuts</option>
-              <option value="true">Actifs</option>
-              <option value="false">Inactifs</option>
+              <option value="">{{ $t('common.all_statuses') }}</option>
+              <option value="true">{{ $t('common.active_plural') }}</option>
+              <option value="false">{{ $t('common.inactive_plural') }}</option>
             </select>
           </div>
           <div class="col-md-3">
             <button class="btn btn-secondary w-100" @click="resetFilters">
-              <i class="fas fa-redo"></i> Réinitialiser
+              <i class="fas fa-redo"></i> {{ $t('common.reset') }}
             </button>
           </div>
         </div>
@@ -54,20 +54,20 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th>Matricule</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Rôle</th>
-                <th>Entreprise</th>
-                <th>Statut</th>
-                <th>Actions</th>
+                <th>{{ $t('common.matricule') }}</th>
+                <th>{{ $t('common.name') }}</th>
+                <th>{{ $t('users.email') }}</th>
+                <th>{{ $t('users.username') }}</th>
+                <th>{{ $t('users.role') }}</th>
+                <th>{{ $t('users.company') }}</th>
+                <th>{{ $t('common.status') }}</th>
+                <th>{{ $t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="users.length === 0">
                 <td colspan="8" class="text-center text-muted">
-                  Aucun utilisateur trouvé
+                  {{ $t('users.no_found') }}
                 </td>
               </tr>
               <tr v-for="user in users" :key="user.id">
@@ -83,35 +83,35 @@
                 <td>{{ user.company?.company_name || '-' }}</td>
                 <td>
                   <span :class="user.active ? 'badge bg-success' : 'badge bg-danger'">
-                    {{ user.active ? 'Actif' : 'Inactif' }}
+                    {{ user.active ? $t('common.active') : $t('common.inactive') }}
                   </span>
                 </td>
                 <td>
                   <button
                     class="btn btn-sm btn-info"
                     @click="viewUser(user.id)"
-                    title="Voir détails"
+                    :title="$t('common.view_details')"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-warning ms-1"
                     @click="editUser(user)"
-                    title="Modifier"
+                    :title="$t('common.edit')"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-primary ms-1"
                     @click="openChangePasswordModal(user)"
-                    title="Changer mot de passe"
+                    :title="$t('users.change_password')"
                   >
                     <i class="fas fa-key"></i>
                   </button>
                   <button
                     class="btn btn-sm btn-danger ms-1"
                     @click="deleteUser(user.id)"
-                    title="Supprimer"
+                    :title="$t('common.delete')"
                   >
                     <i class="fas fa-trash"></i>
                   </button>
@@ -119,6 +119,27 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="pagination.total > 0" class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            {{ pagination.total }} utilisateur(s) - Page {{ pagination.current_page }}/{{ pagination.last_page }}
+          </small>
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              :disabled="pagination.current_page <= 1 || loading"
+              @click="changePage(pagination.current_page - 1)"
+            >
+              Precedent
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              :disabled="pagination.current_page >= pagination.last_page || loading"
+              @click="changePage(pagination.current_page + 1)"
+            >
+              Suivant
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -129,7 +150,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              {{ isEditing ? 'Modifier l\'Utilisateur' : 'Nouvel Utilisateur' }}
+              {{ isEditing ? $t('users.edit') : $t('users.new') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
@@ -137,24 +158,24 @@
             <form>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Nom complet *</label>
+                  <label class="form-label">{{ $t('users.full_name') }} *</label>
                   <input type="text" class="form-control" v-model="form.name" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Nom d'utilisateur *</label>
+                  <label class="form-label">{{ $t('users.username') }} *</label>
                   <input type="text" class="form-control" v-model="form.user_name" required />
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Email *</label>
+                  <label class="form-label">{{ $t('auth.email') }} *</label>
                   <input type="email" class="form-control" v-model="form.email" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Rôle *</label>
+                  <label class="form-label">{{ $t('users.role') }} *</label>
                   <select class="form-select" v-model="form.role_id" required>
-                    <option value="">-- Sélectionner --</option>
+                    <option value="">-- {{ $t('common.select') }} --</option>
                     <option v-for="role in roles" :key="role.role_id" :value="role.role_id">
                       {{ role.name }}
                     </option>
@@ -164,38 +185,38 @@
 
               <div class="row" v-if="!isEditing">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Mot de passe *</label>
+                  <label class="form-label">{{ $t('users.password') }} *</label>
                   <input type="password" class="form-control" v-model="form.password" required />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Confirmer mot de passe *</label>
+                  <label class="form-label">{{ $t('users.confirm_password') }} *</label>
                   <input type="password" class="form-control" v-model="form.password_confirmation" required />
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Entreprise *</label>
+                  <label class="form-label">{{ $t('users.company') }} *</label>
                   <select class="form-select" v-model="form.company_id" required>
-                    <option value="">-- Sélectionner --</option>
+                    <option value="">-- {{ $t('common.select') }} --</option>
                     <option v-for="company in companies" :key="company.company_id" :value="company.company_id">
                       {{ company.company_name }}
                     </option>
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Statut</label>
+                  <label class="form-label">{{ $t('common.status') }}</label>
                   <select class="form-select" v-model="form.active">
-                    <option :value="true">Actif</option>
-                    <option :value="false">Inactif</option>
+                    <option :value="true">{{ $t('common.active') }}</option>
+                    <option :value="false">{{ $t('common.inactive') }}</option>
                   </select>
                 </div>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" @click="saveUser">Enregistrer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.cancel') }}</button>
+            <button type="button" class="btn btn-primary" @click="saveUser">{{ $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -206,24 +227,24 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Changer le Mot de Passe</h5>
+            <h5 class="modal-title">{{ $t('users.change_password') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form>
               <div class="mb-3">
-                <label class="form-label">Nouveau mot de passe *</label>
+                <label class="form-label">{{ $t('users.new_password') }} *</label>
                 <input type="password" class="form-control" v-model="passwordForm.password" required />
               </div>
               <div class="mb-3">
-                <label class="form-label">Confirmer mot de passe *</label>
+                <label class="form-label">{{ $t('users.confirm_password') }} *</label>
                 <input type="password" class="form-control" v-model="passwordForm.password_confirmation" required />
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-primary" @click="changePassword">Changer</button>
+            <button type="button" class="btn btn-primary" @click="changePassword">{{ $t('users.change') }}</button>
           </div>
         </div>
       </div>
@@ -234,47 +255,49 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Détails de l'Utilisateur</h5>
+            <h5 class="modal-title">{{ $t('users.details') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body" v-if="selectedUser">
             <table class="table table-bordered">
-              <tr>
-                <th width="150">ID</th>
-                <td>{{ selectedUser.id }}</td>
-              </tr>
-              <tr>
-                <th>Nom</th>
-                <td>{{ selectedUser.name }}</td>
-              </tr>
-              <tr>
-                <th>Email</th>
-                <td>{{ selectedUser.email }}</td>
-              </tr>
-              <tr>
-                <th>Username</th>
-                <td>{{ selectedUser.user_name }}</td>
-              </tr>
-              <tr>
-                <th>Rôle</th>
-                <td><span class="badge bg-info">{{ selectedUser.role?.name }}</span></td>
-              </tr>
-              <tr>
-                <th>Entreprise</th>
-                <td>{{ selectedUser.company?.company_name }}</td>
-              </tr>
-              <tr>
-                <th>Statut</th>
-                <td>
-                  <span :class="selectedUser.active ? 'badge bg-success' : 'badge bg-danger'">
-                    {{ selectedUser.active ? 'Actif' : 'Inactif' }}
-                  </span>
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <th width="150">{{ $t('common.matricule') }}</th>
+                  <td>{{ selectedUser.id }}</td>
+                </tr>
+                <tr>
+                  <th>{{ $t('common.name') }}</th>
+                  <td>{{ selectedUser.name }}</td>
+                </tr>
+                <tr>
+                  <th>Email</th>
+                  <td>{{ selectedUser.email }}</td>
+                </tr>
+                <tr>
+                  <th>Username</th>
+                  <td>{{ selectedUser.user_name }}</td>
+                </tr>
+                <tr>
+                  <th>Rôle</th>
+                  <td><span class="badge bg-info">{{ selectedUser.role?.name }}</span></td>
+                </tr>
+                <tr>
+                  <th>Entreprise</th>
+                  <td>{{ selectedUser.company?.company_name }}</td>
+                </tr>
+                <tr>
+                  <th>Statut</th>
+                  <td>
+                    <span :class="selectedUser.active ? 'badge bg-success' : 'badge bg-danger'">
+                      {{ selectedUser.active ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>
@@ -308,6 +331,12 @@ export default {
         company_id: '',
         active: ''
       },
+      pagination: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      },
       modal: null,
       passwordModal: null,
       detailModal: null,
@@ -319,9 +348,14 @@ export default {
     this.fetchUsers();
     this.fetchRoles();
     this.fetchCompanies();
-    this.modal = new Modal(document.getElementById('userModal'));
-    this.passwordModal = new Modal(document.getElementById('passwordModal'));
-    this.detailModal = new Modal(document.getElementById('userDetailModal'));
+    this.$nextTick(() => {
+      const userModalEl = document.getElementById('userModal');
+      const passwordModalEl = document.getElementById('passwordModal');
+      const detailModalEl = document.getElementById('userDetailModal');
+      if (userModalEl) this.modal = new Modal(userModalEl);
+      if (passwordModalEl) this.passwordModal = new Modal(passwordModalEl);
+      if (detailModalEl) this.detailModal = new Modal(detailModalEl);
+    });
   },
 
   methods: {
@@ -347,9 +381,16 @@ export default {
         if (this.filters.role_id) params.append('role_id', this.filters.role_id);
         if (this.filters.company_id) params.append('company_id', this.filters.company_id);
         if (this.filters.active !== '') params.append('active', this.filters.active);
+        params.append('page', this.pagination.current_page);
+        params.append('per_page', this.pagination.per_page);
 
         const response = await axios.get(`/users?${params.toString()}`);
-        this.users = response.data.data || response.data;
+        const data = response.data?.data ?? [];
+        this.users = Array.isArray(data) ? data : [];
+        this.pagination = {
+          ...this.pagination,
+          ...(response.data?.meta || {})
+        };
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement des utilisateurs');
@@ -360,8 +401,9 @@ export default {
 
     async fetchRoles() {
       try {
-        const response = await axios.get('/roles');
-        this.roles = response.data.data || response.data;
+        const response = await axios.get('/roles?per_page=1000');
+        const data = response.data?.data ?? response.data;
+        this.roles = Array.isArray(data) ? data : [];
       } catch (error) {
         console.error('Erreur:', error);
       }
@@ -369,8 +411,9 @@ export default {
 
     async fetchCompanies() {
       try {
-        const response = await axios.get('/companies');
-        this.companies = response.data.data || response.data;
+        const response = await axios.get('/companies?per_page=1000');
+        const data = response.data?.data ?? response.data;
+        this.companies = Array.isArray(data) ? data : [];
       } catch (error) {
         console.error('Erreur:', error);
       }
@@ -379,8 +422,8 @@ export default {
     async viewUser(id) {
       try {
         const response = await axios.get(`/users/${id}`);
-        this.selectedUser = response.data.data || response.data;
-        this.detailModal.show();
+        this.selectedUser = response.data?.data ?? response.data;
+        this.detailModal?.show();
       } catch (error) {
         console.error('Erreur:', error);
         alert('Erreur lors du chargement de l\'utilisateur');
@@ -388,6 +431,7 @@ export default {
     },
 
     applyFilters() {
+      this.pagination.current_page = 1;
       this.fetchUsers();
     },
 
@@ -398,13 +442,19 @@ export default {
         company_id: '',
         active: ''
       };
+      this.pagination.current_page = 1;
+      this.fetchUsers();
+    },
+
+    changePage(page) {
+      this.pagination.current_page = page;
       this.fetchUsers();
     },
 
     openCreateModal() {
       this.isEditing = false;
       this.form = this.getEmptyForm();
-      this.modal.show();
+      this.modal?.show();
     },
 
     editUser(user) {
@@ -420,7 +470,7 @@ export default {
         password: '',
         password_confirmation: ''
       };
-      this.modal.show();
+      this.modal?.show();
     },
 
     openChangePasswordModal(user) {
@@ -429,7 +479,7 @@ export default {
         password: '',
         password_confirmation: ''
       };
-      this.passwordModal.show();
+      this.passwordModal?.show();
     },
 
     async saveUser() {
@@ -451,7 +501,7 @@ export default {
           alert('Utilisateur créé avec succès');
         }
 
-        this.modal.hide();
+        this.modal?.hide();
         this.fetchUsers();
       } catch (error) {
         console.error('Erreur:', error.response);
@@ -482,7 +532,7 @@ export default {
         });
 
         alert('Mot de passe modifié avec succès');
-        this.passwordModal.hide();
+        this.passwordModal?.hide();
       } catch (error) {
         console.error('Erreur:', error);
         alert(error.response?.data?.message || 'Erreur lors du changement de mot de passe');

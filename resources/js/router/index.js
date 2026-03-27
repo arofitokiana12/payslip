@@ -11,6 +11,7 @@ import Roles from "../pages/Roles/index.vue"
 import Companies from "../pages/Companies/index.vue"
 import Attendance from '../pages/Attendance/index.vue';
 import Leaves from '../pages/Leaves/index.vue';
+import axios from '../axios';
 
 
 
@@ -106,29 +107,51 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 })
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')  // Vérifie si le token existe
+let authChecked = false;
+let authValid = false;
+let lastValidatedToken = null;
 
-    if (to.meta.requiresAuth && !token) {
-        // Si la route nécessite auth mais pas de token → redirige vers login
-        next({ name: 'Login' })
-    } else if (to.name === 'Login' && token) {
-        // Si l'utilisateur est déjà connecté et veut aller sur login → dashboard
-        next({ name: 'Dashboard' })
-    } else {
-        // Sinon, continue normalement
-        next()
+async function ensureValidToken() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        authChecked = true;
+        authValid = false;
+        return false;
     }
-})
 
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem("token");
-
-    if (to.meta.requiresAuth && !token) {
-        next("/login");
-    } else {
-        next();
+    if (authChecked && token === lastValidatedToken) {
+        return authValid;
     }
+
+    try {
+        await axios.get('/auth/validate-token');
+        authValid = true;
+        lastValidatedToken = token;
+    } catch (error) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        authValid = false;
+        lastValidatedToken = null;
+    } finally {
+        authChecked = true;
+    }
+
+    return authValid;
+}
+
+router.beforeEach(async (to) => {
+    const isAuthenticated = await ensureValidToken();
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
+        return { name: 'Login' };
+    }
+
+    if (to.name === 'Login' && isAuthenticated) {
+        return { name: 'Dashboard' };
+    }
+
+    return true;
 });
 
 
