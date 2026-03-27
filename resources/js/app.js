@@ -20,33 +20,61 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js"; // inclut Popper
 // AdminLTE
 import "admin-lte/dist/js/adminlte.min.js";
 
-function debugLog(runId, hypothesisId, location, message, data = {}) {
-  // #region agent log
-  fetch('http://127.0.0.1:7492/ingest/76f99d8d-fafa-4ba4-8b86-b404e25516e7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4769f4'},body:JSON.stringify({sessionId:'4769f4',runId,hypothesisId,location,message,data,timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
-}
-
 async function validateStoredToken() {
   const token = localStorage.getItem("token");
-  debugLog('run1', 'H4', 'app.js:validateStoredToken:start', 'App startup token validation', {
-    hasToken: !!token
-  });
 
   if (!token) return;
 
   try {
     await axios.get("/auth/validate-token");
-    debugLog('run1', 'H4', 'app.js:validateStoredToken:success', 'Startup validate-token success', {});
+    return true;
   } catch (error) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    debugLog('run1', 'H4', 'app.js:validateStoredToken:error', 'Startup validate-token error', {
-      status: error?.response?.status || null,
-      url: error?.config?.url || null
-    });
+    return false;
+  }
+
+  return true;
+}
+
+async function validateAndEnforceCurrentToken(trigger) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return;
+  }
+
+  try {
+    await axios.get("/auth/validate-token");
+  } catch (error) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    if (window.location.pathname !== "/") {
+      window.location.href = "/";
+    }
   }
 }
 
+function startTokenTamperMonitor() {
+  let lastToken = localStorage.getItem("token");
+
+  window.setInterval(() => {
+    const currentToken = localStorage.getItem("token");
+    if (currentToken !== lastToken) {
+      lastToken = currentToken;
+      validateAndEnforceCurrentToken("interval-token-changed");
+    }
+  }, 1000);
+
+  window.addEventListener("focus", () => validateAndEnforceCurrentToken("window-focus"));
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      validateAndEnforceCurrentToken("visibility-visible");
+    }
+  });
+}
+
 validateStoredToken().finally(() => {
+  startTokenTamperMonitor();
   createApp(App).use(router).use(i18n).mount("#app");
 });

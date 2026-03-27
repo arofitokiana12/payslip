@@ -73,42 +73,22 @@ const error = ref('')
 const loading = ref(false)
 const router = useRouter()
 
-const debugLog = (runId, hypothesisId, location, message, data = {}) => {
-  // #region agent log
-  fetch('http://127.0.0.1:7492/ingest/76f99d8d-fafa-4ba4-8b86-b404e25516e7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4769f4'},body:JSON.stringify({sessionId:'4769f4',runId,hypothesisId,location,message,data,timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
-}
-
 const loginUser = async () => {
   error.value = ''
   loading.value = true
-  debugLog('run1', 'H1', 'Login.vue:loginUser:start', 'Login submit started', {
-    hasEmail: !!email.value,
-    emailLength: email.value?.length || 0
-  })
   try {
     const response = await axios.post('/login', {
       email: email.value,
       password: password.value,
-    })
-    debugLog('run1', 'H1', 'Login.vue:loginUser:loginSuccess', 'Login API success', {
-      hasTokenInResponse: !!response.data?.token
     })
     if (response.data?.token) {
       localStorage.setItem('token', response.data.token)
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user))
       }
-      debugLog('run1', 'H1', 'Login.vue:loginUser:tokenStored', 'Token stored in localStorage', {
-        hasTokenAfterStore: !!localStorage.getItem('token')
-      })
     }
     router.push({ name: 'Dashboard' })
   } catch (err) {
-    debugLog('run1', 'H1', 'Login.vue:loginUser:loginError', 'Login API error', {
-      status: err?.response?.status || null,
-      message: err?.response?.data?.message || null
-    })
     if (err.response?.status === 401) {
       error.value = 'Email ou mot de passe incorrect.'
     } else {
