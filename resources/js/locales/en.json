@@ -66,7 +66,7 @@
     "connect": "Sign in",
     "connecting": "Signing in...",
     "tagline": "Payroll & HR Management",
-    "email_placeholder": "you@example.com",
+    "email_placeholder": "you{'@'}example.com",
     "password_placeholder": "••••••••"
   },
   "employees": {

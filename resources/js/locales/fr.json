@@ -66,7 +66,7 @@
     "connect": "Se connecter",
     "connecting": "Connexion...",
     "tagline": "Gestion de paie & RH",
-    "email_placeholder": "vous@exemple.com",
+    "email_placeholder": "vous{'@'}exemple.com",
     "password_placeholder": "••••••••"
   },
   "employees": {
