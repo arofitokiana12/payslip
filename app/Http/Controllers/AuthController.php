@@ -9,7 +9,7 @@ class AuthController extends Controller
 {
     public function index()
     {
-        $response= 'okr';
+        $response= 'ok';
         return $response;
     }
 

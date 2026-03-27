@@ -54,7 +54,7 @@
           <table class="table table-bordered table-hover">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Matricule</th>
                 <th>Nom</th>
                 <th>Email</th>
                 <th>Username</th>

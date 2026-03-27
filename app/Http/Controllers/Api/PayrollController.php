@@ -69,9 +69,9 @@ class PayrollController extends Controller
         ]);
     }
 
-    /**
-     * Calculer la paie (sans créer de fiche)
-     */
+
+    //  Calculer la paie (sans créer de fiche)
+
     public function calculate(Request $request)
     {
         $validated = $request->validate([
@@ -515,8 +515,8 @@ class PayrollController extends Controller
         ]);
     }
 
-    /* Télécharger une fiche de paie en PDF
-    */
+    //  Télécharger une fiche de paie en PDF
+
    public function downloadPDF($id)
    {
        $payslip = Payslip::with(['employee.position', 'items'])->findOrFail($id);

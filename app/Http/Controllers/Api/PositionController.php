@@ -12,7 +12,7 @@ class PositionController extends Controller
     // ===================================================================
     // INDEX — GET /api/positions
     // Supporte filtrer par entreprise : ?company_id=X
-    
+
     public function index(Request $request): JsonResponse
     {
         $query = Position::with('company');
@@ -27,7 +27,7 @@ class PositionController extends Controller
             'status' => 'success',
             'data'   => $positions,
         ]);
-    }
+    } 
 
     // ===================================================================
     // SHOW — GET /api/positions/{position}

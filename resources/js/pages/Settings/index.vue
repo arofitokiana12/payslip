@@ -14,6 +14,7 @@
               :class="{ active: activeTab === 'general' }"
               @click="activeTab = 'general'"
             >
+            
               <i class="fas fa-cog"></i>
               {{ $t('settings.general') }}
             </button>

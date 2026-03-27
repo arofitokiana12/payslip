@@ -23,9 +23,9 @@ class SettingController extends Controller
         ]);
     }
 
-    /**
-     * Récupérer les paramètres d'une catégorie spécifique
-     */
+
+    //   Récupérer les paramètres d'une catégorie spécifique
+
     public function getByCategory($category)
     {
         $settings = Setting::where('category', $category)->get();
@@ -35,9 +35,9 @@ class SettingController extends Controller
         ]);
     }
 
-    /**
-     * Récupérer un paramètre spécifique par sa clé
-     */
+
+    //   Récupérer un paramètre spécifique par sa clé
+
     public function getByKey($key)
     {
         $setting = Setting::where('key', $key)->first();

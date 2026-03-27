@@ -402,7 +402,16 @@ export default {
       }
 
       const chartData = this.charts.attendance_overview;
-      const colors = chartData?.labels.map(label => chartData.colors[label] || '#999') || [];
+     const palette = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+
+const colors = chartData?.labels.map((_, index) => {
+  // 60 = Jaune pur, 140 = Vert gazon
+  // On répartit les couleurs entre ces deux bornes
+  const hue = 100 + (index * (80 / Math.max(1, chartData.labels.length - 1)));
+  return `hsl(${hue}, 80%, 85%)`; // 70% saturation et 85% luminosité pour le côté pastel
+}) || [];
+
+
 
       const ctx = this.$refs.attendanceChart.getContext('2d');
       this.chartInstances.attendance = new Chart(ctx, {

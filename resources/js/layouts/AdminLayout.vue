@@ -114,6 +114,10 @@
             data-accordion="false"
             id="navigation"
           >
+
+           <!-- Section Administration -->
+            <li class="nav-header">ADMINISTRATION</li>
+
             <li class="nav-item">
               <router-link to="/admin/dashboard" class="nav-link">
                 <i class="bi bi-speedometer2"></i>
@@ -131,12 +135,11 @@
             <li class="nav-item">
               <router-link to="/admin/payroll" class="nav-link">
                 <i class="nav-icon fas fa-money-bill-wave"></i>
-                <p>Paie</p>
+                <p>Payroll</p>
               </router-link>
             </li>
 
-            <!-- Section Administration -->
-            <li class="nav-header">ADMINISTRATION</li>
+
 
             <li class="nav-item">
               <router-link to="/admin/companies" class="nav-link">
@@ -148,7 +151,7 @@
             <li class="nav-item">
               <router-link to="/admin/users" class="nav-link">
                 <i class="nav-icon fas fa-user-cog"></i>
-                <p>Utilisateurs</p>
+                <p>Users</p>
               </router-link>
             </li>
 
@@ -172,12 +175,7 @@
               </router-link>
             </li>
 
-            <li class="nav-item">
-              <router-link to="/admin/payroll" class="nav-link">
-                <i class="bi bi-credit-card-2-back"></i>
-                <p>Payslip</p>
-              </router-link>
-            </li>
+
 
             <li class="nav-item">
               <router-link to="/admin/positions" class="nav-link">
